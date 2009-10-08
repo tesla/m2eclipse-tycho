@@ -12,13 +12,13 @@ import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.internal.core.ClasspathComputer;
 import org.eclipse.pde.internal.core.natures.PDE;
 import org.eclipse.pde.internal.core.util.CoreUtility;
+import org.maven.ide.eclipse.internal.project.CustomizableLifecycleMapping;
 import org.maven.ide.eclipse.project.configurator.IExtensionLifecycleMapping;
-import org.maven.ide.eclipse.project.configurator.NoopLifecycleMapping;
 import org.maven.ide.eclipse.project.configurator.ProjectConfigurationRequest;
 
 @SuppressWarnings( "restriction" )
 public class TychoLifecycleMapping
-    extends NoopLifecycleMapping
+    extends CustomizableLifecycleMapping
     implements IExtensionLifecycleMapping
 {
 
@@ -26,6 +26,8 @@ public class TychoLifecycleMapping
     public void configure( ProjectConfigurationRequest request, IProgressMonitor monitor )
         throws CoreException
     {
+        super.configure( request, monitor );
+
         MavenProject mavenProject = request.getMavenProject();
         IProject project = request.getProject();
 
