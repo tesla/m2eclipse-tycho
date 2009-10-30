@@ -1,5 +1,7 @@
 package org.sonatype.tycho.m2e.internal;
 
+import java.io.File;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.pde.core.plugin.PluginRegistry;
@@ -15,9 +17,13 @@ public class TychoLifecycleMappingTest
     private IMavenProjectFacade importProjectAndAssertLifecycleMappingType( String pomName )
         throws Exception
     {
+        assertTrue( new File( pomName ).exists() );
+        
         IMavenProjectFacade facade = importMavenProject( pomName );
+        assertNotNull( facade );
         ILifecycleMapping lifecycleMapping = projectConfigurationManager.getLifecycleMapping( facade, monitor );
 
+        assertNotNull( lifecycleMapping );
         assertTrue( lifecycleMapping instanceof TychoLifecycleMapping );
         
         return facade;
