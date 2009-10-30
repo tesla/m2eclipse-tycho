@@ -16,6 +16,7 @@
   </properties>
 
   <modules>
+    <module>org.sonatype.tycho.components</module>
     <module>org.sonatype.tycho.m2e</module>
     <module>org.sonatype.tycho.m2e.feature</module>
     <module>org.sonatype.tycho.update</module>
