@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>lifecyclemapping</groupId>
+  <artifactId>parent</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <properties>
+    <tycho-version>0.5.0-SNAPSHOT</tycho-version>
+    <m2e-version>0.9.9-SNAPSHOT</m2e-version>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.tycho</groupId>
+        <artifactId>tycho-maven-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <extensions>true</extensions>
+      </plugin>
+      <plugin>
+        <groupId>org.maven.ide.eclipse</groupId>
+        <artifactId>lifecycle-mapping</artifactId>
+        <version>${m2e-version}</version>
+        <configuration>
+          <mappingId>org.sonatype.tycho.m2e.tychoLifecycleMapping</mappingId>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

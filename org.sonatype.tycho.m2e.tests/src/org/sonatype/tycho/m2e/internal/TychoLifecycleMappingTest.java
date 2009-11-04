@@ -14,12 +14,12 @@ import org.maven.ide.eclipse.project.configurator.ILifecycleMapping;
 public class TychoLifecycleMappingTest
     extends AbstractLifecycleMappingTest
 {
-    private IMavenProjectFacade importProjectAndAssertLifecycleMappingType( String pomName )
+    private IMavenProjectFacade importProjectAndAssertLifecycleMappingType( String basedir, String pomName )
         throws Exception
     {
-        assertTrue( new File( pomName ).exists() );
+        assertTrue( new File( basedir, pomName ).exists() );
         
-        IMavenProjectFacade facade = importMavenProject( pomName );
+        IMavenProjectFacade facade = importMavenProject( basedir, pomName );
         assertNotNull( facade );
         ILifecycleMapping lifecycleMapping = projectConfigurationManager.getLifecycleMapping( facade, monitor );
 
@@ -32,7 +32,7 @@ public class TychoLifecycleMappingTest
     public void testTychoLifecycleMapping_EclipsePlugin()
         throws Exception
     {
-        IMavenProjectFacade facade = importProjectAndAssertLifecycleMappingType( "projects/lifecyclemapping/tycho-eclipse-plugin/pom.xml" );
+        IMavenProjectFacade facade = importProjectAndAssertLifecycleMappingType( "projects/lifecyclemapping", "tycho-eclipse-plugin/pom.xml" );
 
         IProject project = facade.getProject();
         assertTrue( project.hasNature( PDE.PLUGIN_NATURE ) );
@@ -44,7 +44,7 @@ public class TychoLifecycleMappingTest
     public void testTychoLifecycleMapping_EclipseTestPlugin()
         throws Exception
     {
-        IMavenProjectFacade facade = importProjectAndAssertLifecycleMappingType( "projects/lifecyclemapping/tycho-eclipse-test-plugin/pom.xml" );
+        IMavenProjectFacade facade = importProjectAndAssertLifecycleMappingType( "projects/lifecyclemapping", "tycho-eclipse-test-plugin/pom.xml" );
 
         IProject project = facade.getProject();
         assertTrue( project.hasNature( PDE.PLUGIN_NATURE ) );
@@ -55,7 +55,7 @@ public class TychoLifecycleMappingTest
     public void testTychoLifecycleMapping_EclipseFeature()
         throws Exception
     {
-        IMavenProjectFacade facade = importProjectAndAssertLifecycleMappingType( "projects/lifecyclemapping/tycho-eclipse-feature/pom.xml" );
+        IMavenProjectFacade facade = importProjectAndAssertLifecycleMappingType( "projects/lifecyclemapping", "tycho-eclipse-feature/pom.xml" );
 
         IProject project = facade.getProject();
         assertTrue( project.hasNature( PDE.FEATURE_NATURE ) );
@@ -64,7 +64,7 @@ public class TychoLifecycleMappingTest
     public void testTychoLifecycleMapping_EclipseUpdateSite()
         throws Exception
     {
-        IMavenProjectFacade facade = importProjectAndAssertLifecycleMappingType( "projects/lifecyclemapping/tycho-eclipse-update-site/pom.xml" );
+        IMavenProjectFacade facade = importProjectAndAssertLifecycleMappingType( "projects/lifecyclemapping", "tycho-eclipse-update-site/pom.xml" );
 
         IProject project = facade.getProject();
         assertTrue( project.hasNature( PDE.SITE_NATURE ) );

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.apache.maven</groupId>
+  <artifactId>maven-model-builder</artifactId>
+  <version>3.0-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20091002.163705</timestamp>
+      <buildNumber>33</buildNumber>
+    </snapshot>
+    <lastUpdated>20091002163810</lastUpdated>
+  </versioning>
+</metadata>
