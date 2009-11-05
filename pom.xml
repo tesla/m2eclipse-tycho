@@ -115,37 +115,5 @@
         <osgi.ws>cocoa</osgi.ws>
       </properties>      
     </profile>
-
-    <profile>
-      <id>publish-site</id>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.sonatype.maven.plugins</groupId>
-            <artifactId>maven-upload-plugin</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <executions>
-              <execution>
-                <id>publish-site</id>
-                <phase>deploy</phase>
-                <goals>
-                  <goal>upload-file</goal>
-                </goals>
-                <configuration>
-                  <serverId>sonatype-commercial</serverId>
-                  <repositoryUrl>${s2.site-compressed}</repositoryUrl>
-
-                  <file>${project.build.directory}/${project.artifactId}-${project.version}-site.zip</file>
-                  <repositoryPath>s2/tycho-m2e-dev</repositoryPath>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-
-    </profile>
-
   </profiles>
 </project>
