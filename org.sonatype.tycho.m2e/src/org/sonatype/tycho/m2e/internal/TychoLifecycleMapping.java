@@ -1,5 +1,9 @@
 package org.sonatype.tycho.m2e.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -13,6 +17,8 @@ import org.eclipse.pde.internal.core.ClasspathComputer;
 import org.eclipse.pde.internal.core.natures.PDE;
 import org.eclipse.pde.internal.core.util.CoreUtility;
 import org.maven.ide.eclipse.internal.project.CustomizableLifecycleMapping;
+import org.maven.ide.eclipse.project.IMavenProjectFacade;
+import org.maven.ide.eclipse.project.configurator.AbstractProjectConfigurator;
 import org.maven.ide.eclipse.project.configurator.IExtensionLifecycleMapping;
 import org.maven.ide.eclipse.project.configurator.ProjectConfigurationRequest;
 
@@ -49,7 +55,7 @@ public class TychoLifecycleMapping
             // see org.eclipse.pde.internal.ui.wizards.site.NewSiteProjectCreationOperation
             if ( !project.hasNature( PDE.SITE_NATURE ) )
             {
-                CoreUtility.addNatureToProject(project, PDE.SITE_NATURE, monitor);
+                CoreUtility.addNatureToProject( project, PDE.SITE_NATURE, monitor );
             }
         }
     }
@@ -70,7 +76,7 @@ public class TychoLifecycleMapping
         }
 
         // PDE can't handle default JDT classpath
-        IJavaProject javaProject = JavaCore.create(project);
+        IJavaProject javaProject = JavaCore.create( project );
         javaProject.setRawClasspath( new IClasspathEntry[0], true, monitor );
 
         // see org.eclipse.pde.internal.ui.wizards.tools.UpdateClasspathJob
@@ -78,9 +84,25 @@ public class TychoLifecycleMapping
         if ( model != null )
         {
             // PDE populates the model cache lazily from WorkspacePluginModelManager.visit() ResourceChangeListenter
-            // Avoid NPE for now, but users may have to invoke PDE->UpdateClasspath manually  
+            // Avoid NPE for now, but users may have to invoke PDE->UpdateClasspath manually
             ClasspathComputer.setClasspath( project, model );
         }
     }
 
+    @Override
+    public List<AbstractProjectConfigurator> getProjectConfigurators( IMavenProjectFacade facade,
+                                                                      IProgressMonitor monitor )
+        throws CoreException
+    {
+        MavenProject mavenProject = facade.getMavenProject( monitor );
+        Plugin plugin = mavenProject.getPlugin( "org.maven.ide.eclipse:lifecycle-mapping" );
+
+        if ( plugin == null )
+        {
+            // it is okay to have no mapping
+            return new ArrayList<AbstractProjectConfigurator>();
+        }
+
+        return super.getProjectConfigurators( facade, monitor );
+    }
 }
