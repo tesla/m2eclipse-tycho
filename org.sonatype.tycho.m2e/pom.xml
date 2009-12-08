@@ -10,4 +10,21 @@
 
   <artifactId>org.sonatype.tycho.m2e</artifactId>
   <packaging>eclipse-plugin</packaging>
+
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.sonatype.tycho</groupId>
+        <artifactId>tycho-proguard-plugin</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <configuration>
+          <keep>
+            <name>org.sonatype.tycho.m2e.internal.TychoLifecycleMapping</name>
+          </keep>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
