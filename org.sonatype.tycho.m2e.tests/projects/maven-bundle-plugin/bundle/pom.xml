@@ -28,6 +28,9 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <manifestLocation>META-INF</manifestLocation>
+        </configuration>
       </plugin>
     </plugins>
   </build>

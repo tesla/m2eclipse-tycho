@@ -1,6 +1,7 @@
 package org.sonatype.tycho.m2e.internal;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -31,5 +32,9 @@ public class MavenBundlePluginTest
         IClasspathEntry[] cp = javaProject.getRawClasspath();
         assertEquals( 3, cp.length );
         assertEquals( new Path( BuildPathManager.CONTAINER_ID ), cp[2].getPath() );
+
+        // make sure manifest is generated properly
+        project.build( IncrementalProjectBuilder.FULL_BUILD, monitor );
+        assertTrue( project.getFile( "META-INF/MANIFEST.MF" ).isAccessible() );
     }
 }
