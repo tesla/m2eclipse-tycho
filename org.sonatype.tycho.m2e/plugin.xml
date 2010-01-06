@@ -32,5 +32,14 @@
             lifecycleMappingId="org.sonatype.tycho.m2e.tychoLifecycleMapping"
             packaging="eclipse-application"/>
    </extension>
+   <extension
+         point="org.maven.ide.eclipse.projectConfigurators">
+      <configurator
+            class="org.sonatype.tycho.m2e.internal.OsgiBundleProjectConfigurator"
+            generic="true"
+            id="maven-bundle-plugin"
+            name="Project Configurator for maven-bundle-plugin osgi-bundle projects">
+      </configurator>
+   </extension>
 
 </plugin>
