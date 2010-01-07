@@ -1,19 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
+<!--
+  Copyright (c) 2008 Sonatype, Inc.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <prerequisites>
+    <maven>3.0</maven>
+  </prerequisites>
+
   <parent>
-    <groupId>com.sonatype.s2</groupId>
-    <artifactId>s2-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <relativePath>../s2-parent/pom.xml</relativePath>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>5</version>
   </parent>
 
   <groupId>com.sonatype.s2.tycho</groupId>
   <artifactId>tycho-m2e-parent</artifactId>
   <version>0.4.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  
+
+  <properties>
+    <tycho-version>0.7.0-SNAPSHOT</tycho-version>
+  </properties>
+
   <modules>
     <module>org.sonatype.tycho.m2e</module>
     <module>org.sonatype.tycho.m2e.feature</module>
@@ -21,5 +36,80 @@
     
     <module>org.sonatype.tycho.m2e.tests</module>
   </modules>
+
+
+  <repositories>
+    <repository>
+      <id>galileo</id>
+      <layout>p2</layout>
+      <url>http://download.eclipse.org/releases/galileo</url>
+    </repository>
+    <repository>
+      <id>m2e</id>
+      <url>http://repository.sonatype.org/content/repositories/eclipse-snapshots/</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>sonatype-public</id>
+      <url>http://repository.sonatype.org/content/groups/sonatype-public-grid</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.tycho</groupId>
+        <artifactId>tycho-maven-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <extensions>true</extensions>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.tycho</groupId>
+        <artifactId>target-platform-configuration</artifactId>
+        <version>${tycho-version}</version>
+        <configuration>
+          <resolver>p2</resolver>
+          <pomDependencies>consider</pomDependencies>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>sun-jvm</id>
+      <activation>
+        <property>
+          <name>java.vendor.url</name>
+          <value>http://java.sun.com/</value>
+        </property>
+      </activation>
+      <properties>
+        <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>osx</id>
+      <activation>
+        <property>
+          <name>java.vendor.url</name>
+          <value>http://www.apple.com/</value>
+        </property>
+      </activation>
+      <properties>
+        <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m -Dosgi.ws=cocoa -XstartOnFirstThread</tycho.test.jvmArgs>
+        <osgi.ws>cocoa</osgi.ws>
+      </properties>      
+    </profile>
+  </profiles>
   
 </project>
