@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.sonatype.s2.tycho</groupId>
+    <groupId>org.sonatype.tycho.m2e</groupId>
     <artifactId>tycho-m2e-parent</artifactId>
     <version>0.4.0-SNAPSHOT</version>
   </parent>
@@ -16,9 +17,25 @@
       <plugin>
         <groupId>org.sonatype.tycho</groupId>
         <artifactId>maven-osgi-packaging-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>build-qualifier</id>
+            <goals>
+              <goal>build-qualifier</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.tycho</groupId>
+        <artifactId>maven-osgi-packaging-plugin</artifactId>
         <configuration>
-          <metadataRepositoryName>Tycho Project Configurators Update Site</metadataRepositoryName>
-          <artifactRepositoryName>Tycho Project Configurators Update Site Artifacts</artifactRepositoryName>
+          <metadataRepositoryName>Tycho Project Configurators Update
+            Site</metadataRepositoryName>
+          <artifactRepositoryName>Tycho Project Configurators Update
+            Site Artifacts</artifactRepositoryName>
         </configuration>
       </plugin>
 
@@ -43,7 +60,7 @@
       </plugin>
     </plugins>
   </build>
-  
+
   <profiles>
     <profile>
       <id>publish-site</id>
@@ -62,11 +79,11 @@
                   <goal>upload-file</goal>
                 </goals>
                 <configuration>
-                  <serverId>sonatype-commercial</serverId>
-                  <repositoryUrl>${s2.site-compressed}</repositoryUrl>
-
                   <file>${project.build.directory}/${project.artifactId}-${project.version}-site.zip</file>
-                  <repositoryPath>s2/tycho-m2e-dev</repositoryPath>
+
+                  <serverId>forge-releases</serverId>
+                  <repositoryUrl>${m2e.site-compressed}</repositoryUrl>
+                  <repositoryPath>m2e/m2eclipse-tycho-${buildQualifier}</repositoryPath>
                 </configuration>
               </execution>
             </executions>

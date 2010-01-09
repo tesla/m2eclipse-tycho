@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/org.sonatype.tycho.m2e.feature_0.4.0.qualifier.jar" id="org.sonatype.tycho.m2e.feature" version="0.4.0.qualifier">
-      <category name="Tycho Project Configurators"/>
+   <feature url="features/org.sonatype.tycho.m2e.feature_0.0.0.jar" id="org.sonatype.tycho.m2e.feature" version="0.0.0">
+      <category name="tycho"/>
    </feature>
-   <category-def name="Tycho Project Configurators" label="Tycho Project Configurators"/>
+   <feature url="features/org.maven.ide.components.maven_embedder.feature_0.0.0.jar" id="org.maven.ide.components.maven_embedder.feature" version="0.0.0">
+      <category name="m2e"/>
+   </feature>
+   <feature url="features/org.maven.ide.eclipse.editor.feature_0.0.0.jar" id="org.maven.ide.eclipse.editor.feature" version="0.0.0">
+      <category name="m2e"/>
+   </feature>
+   <feature url="features/org.maven.ide.eclipse.editor.xml.feature_0.0.0.jar" id="org.maven.ide.eclipse.editor.xml.feature" version="0.0.0">
+      <category name="m2e"/>
+   </feature>
+   <feature url="features/org.maven.ide.eclipse.feature_0.0.0.jar" id="org.maven.ide.eclipse.feature" version="0.0.0">
+      <category name="m2e"/>
+   </feature>
+   <feature url="features/org.maven.ide.eclipse.temporary.mojos.feature_0.0.0.jar" id="org.maven.ide.eclipse.temporary.mojos.feature" version="0.0.0">
+      <category name="m2e"/>
+   </feature>
+   <category-def name="tycho" label="Maven OSGi Development">
+      <description>
+         Support for Tycho (MANIFEST-first) and maven-bundle-plugin (POM-first) projects.
+      </description>
+   </category-def>
+   <category-def name="m2e" label="Maven Integration for Eclipse"/>
 </site>

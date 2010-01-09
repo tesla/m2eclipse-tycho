@@ -20,13 +20,18 @@
     <version>5</version>
   </parent>
 
-  <groupId>com.sonatype.s2.tycho</groupId>
+  <groupId>org.sonatype.tycho.m2e</groupId>
   <artifactId>tycho-m2e-parent</artifactId>
   <version>0.4.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <properties>
     <tycho-version>0.7.0-SNAPSHOT</tycho-version>
+
+    <m2e.releases>http://repository.sonatype.org/content/repositories/eclipse/</m2e.releases>
+    <m2e.snapshots>http://repository.sonatype.org/content/repositories/eclipse-snapshots/</m2e.snapshots>
+    <m2e.site>http://localhost</m2e.site>
+    <m2e.site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</m2e.site-compressed>
   </properties>
 
   <modules>
@@ -45,8 +50,12 @@
       <url>http://download.eclipse.org/releases/galileo</url>
     </repository>
     <repository>
-      <id>m2e</id>
+      <id>m2e-snapshots</id>
       <url>http://repository.sonatype.org/content/repositories/eclipse-snapshots/</url>
+    </repository>
+    <repository>
+      <id>m2e</id>
+      <url>http://repository.sonatype.org/content/repositories/eclipse/</url>
     </repository>
   </repositories>
 
@@ -62,6 +71,21 @@
       </releases>
     </pluginRepository>
   </pluginRepositories>
+
+  <distributionManagement>
+    <repository>
+      <id>forge-releases</id>
+      <url>${m2e.releases}</url>
+    </repository>
+    <snapshotRepository>
+      <id>forge-snapshots</id>
+      <url>${m2e.snapshots}</url>
+    </snapshotRepository>
+    <site>
+      <id>m2e-site</id>
+      <url>${m2e.site}</url>
+    </site>
+  </distributionManagement>
 
   <build>
     <plugins>
