@@ -26,6 +26,8 @@
   <packaging>pom</packaging>
 
   <properties>
+    <m2e.version>0.9.9/N/201001121202</m2e.version>
+
     <tycho-version>0.7.0-SNAPSHOT</tycho-version>
 
     <m2e.releases>http://repository.sonatype.org/content/repositories/eclipse/</m2e.releases>
@@ -50,12 +52,9 @@
       <url>http://download.eclipse.org/releases/galileo</url>
     </repository>
     <repository>
-      <id>m2e-snapshots</id>
-      <url>http://repository.sonatype.org/content/repositories/eclipse-snapshots/</url>
-    </repository>
-    <repository>
       <id>m2e</id>
-      <url>http://repository.sonatype.org/content/repositories/eclipse/</url>
+      <layout>p2</layout>
+      <url>http://repository.sonatype.org/content/sites/forge-sites/m2e/${m2e.version}</url>
     </repository>
   </repositories>
 

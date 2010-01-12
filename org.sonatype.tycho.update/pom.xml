@@ -83,7 +83,7 @@
 
                   <serverId>forge-releases</serverId>
                   <repositoryUrl>${m2e.site-compressed}</repositoryUrl>
-                  <repositoryPath>m2e/m2eclipse-tycho-${buildQualifier}</repositoryPath>
+                  <repositoryPath>m2e/m2eclipse-tycho/${unqualifiedVersion}/N/${buildQualifier}</repositoryPath>
                 </configuration>
               </execution>
             </executions>
