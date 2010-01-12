@@ -31,8 +31,7 @@
           <useUIHarness>true</useUIHarness>
           <!-- kill test JVM if tests take more than 10 minutes (600 seconds) to finish -->
           <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
-          <!-- Temporary until I find out why the unit tests fail in mvn
-          <skip>true</skip> -->
+          <argLine>${tycho.test.jvmArgs}</argLine>
         </configuration>
       </plugin>
     </plugins>
