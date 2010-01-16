@@ -8,11 +8,14 @@
 
 package org.sonatype.tycho.m2e.internal;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecution;
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -37,7 +40,20 @@ public class OsgiBundleProjectConfigurator
     {
         if ( isOsgiBundleProject( request.getMavenProjectFacade(), monitor ) )
         {
-            addNature( request.getProject(), PDE.PLUGIN_NATURE, monitor );
+            IProject project = request.getProject();
+            addNature( project, PDE.PLUGIN_NATURE, monitor );
+            IProjectDescription description = project.getDescription();
+            ICommand[] prevBuilders = description.getBuildSpec();
+            ArrayList<ICommand> newBuilders = new ArrayList<ICommand>();
+            for ( ICommand builder : prevBuilders )
+            {
+                if ( !builder.getBuilderName().startsWith( "org.eclipse.pde" ) )
+                {
+                    newBuilders.add( builder );
+                }
+            }
+            description.setBuildSpec( newBuilders.toArray( new ICommand[newBuilders.size()] ) );
+            project.setDescription( description, monitor );
         }
     }
 

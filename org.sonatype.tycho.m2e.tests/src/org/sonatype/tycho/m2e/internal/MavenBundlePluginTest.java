@@ -8,6 +8,7 @@
 
 package org.sonatype.tycho.m2e.internal;
 
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.Path;
@@ -44,5 +45,11 @@ public class MavenBundlePluginTest
         // make sure manifest is generated properly
         project.build( IncrementalProjectBuilder.FULL_BUILD, monitor );
         assertTrue( project.getFile( "META-INF/MANIFEST.MF" ).isAccessible() );
+
+        // make sure PDE builder is not enabled
+        ICommand[] builders = project.getDescription().getBuildSpec();
+        assertEquals( 2, builders.length );
+        assertEquals( "org.eclipse.jdt.core.javabuilder", builders[0].getBuilderName() );
+        assertEquals( "org.maven.ide.eclipse.maven2Builder", builders[1].getBuilderName() );
     }
 }
