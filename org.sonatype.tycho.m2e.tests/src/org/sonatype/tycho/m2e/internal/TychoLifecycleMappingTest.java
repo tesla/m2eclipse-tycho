@@ -11,8 +11,11 @@ package org.sonatype.tycho.m2e.internal;
 import java.io.File;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
+import org.eclipse.pde.internal.core.ClasspathComputer;
 import org.eclipse.pde.internal.core.natures.PDE;
 import org.maven.ide.eclipse.configurators.AbstractLifecycleMappingTest;
 import org.maven.ide.eclipse.project.IMavenProjectFacade;
@@ -45,8 +48,26 @@ public class TychoLifecycleMappingTest
         IProject project = facade.getProject();
         assertTrue( project.hasNature( PDE.PLUGIN_NATURE ) );
         assertTrue( project.hasNature( JavaCore.NATURE_ID ) );
-        assertNotNull(PluginRegistry.findModel( project ));
-        // project.build( 6, monitor );
+        IPluginModelBase model = PluginRegistry.findModel( project );
+        assertNotNull( model );
+
+        IClasspathEntry[] classpathEntries =
+            ClasspathComputer.getClasspath( project, model, null /* sourceLibraryMap */, false /* clear */, true /* overrideCompliance */);
+        assertEquals( 2, classpathEntries.length );
+        assertClasspathContains( classpathEntries, "org.eclipse.jdt.launching.JRE_CONTAINER" );
+        assertClasspathContains( classpathEntries, "org.eclipse.pde.core.requiredPlugins" );
+    }
+
+    private void assertClasspathContains( IClasspathEntry[] classpathEntries, String path )
+    {
+        for ( IClasspathEntry classpathEntry : classpathEntries )
+        {
+            if ( path.equals( classpathEntry.getPath().toString() ) )
+            {
+                return;
+            }
+        }
+        fail( "Classpath does not contain: " + path );
     }
 
     public void testTychoLifecycleMapping_EclipseTestPlugin()
@@ -57,7 +78,14 @@ public class TychoLifecycleMappingTest
         IProject project = facade.getProject();
         assertTrue( project.hasNature( PDE.PLUGIN_NATURE ) );
         assertTrue( project.hasNature( JavaCore.NATURE_ID ) );
-        assertNotNull(PluginRegistry.findModel( project ));
+        IPluginModelBase model = PluginRegistry.findModel( project );
+        assertNotNull( model );
+
+        IClasspathEntry[] classpathEntries =
+            ClasspathComputer.getClasspath( project, model, null /* sourceLibraryMap */, false /* clear */, true /* overrideCompliance */);
+        assertEquals( 2, classpathEntries.length );
+        assertClasspathContains( classpathEntries, "org.eclipse.jdt.launching.JRE_CONTAINER" );
+        assertClasspathContains( classpathEntries, "org.eclipse.pde.core.requiredPlugins" );
     }
 
     public void testTychoLifecycleMapping_EclipseFeature()
