@@ -17,9 +17,9 @@ import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.internal.core.ClasspathComputer;
 import org.eclipse.pde.internal.core.natures.PDE;
-import org.maven.ide.eclipse.configurators.AbstractLifecycleMappingTest;
 import org.maven.ide.eclipse.project.IMavenProjectFacade;
 import org.maven.ide.eclipse.project.configurator.ILifecycleMapping;
+import org.maven.ide.eclipse.tests.common.AbstractLifecycleMappingTest;
 
 @SuppressWarnings( "restriction" )
 public class TychoLifecycleMappingTest

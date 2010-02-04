@@ -16,10 +16,10 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.pde.internal.core.natures.PDE;
-import org.maven.ide.eclipse.configurators.AbstractLifecycleMappingTest;
 import org.maven.ide.eclipse.core.IMavenConstants;
 import org.maven.ide.eclipse.jdt.BuildPathManager;
 import org.maven.ide.eclipse.project.IMavenProjectFacade;
+import org.maven.ide.eclipse.tests.common.AbstractLifecycleMappingTest;
 
 @SuppressWarnings( "restriction" )
 public class MavenBundlePluginTest
