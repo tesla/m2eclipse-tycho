@@ -9,7 +9,7 @@
 
   <properties>
     <tycho-version>0.5.0-SNAPSHOT</tycho-version>
-    <m2e-version>0.9.9-SNAPSHOT</m2e-version>
+    <m2e-version>0.10.0</m2e-version>
   </properties>
 
   <build>

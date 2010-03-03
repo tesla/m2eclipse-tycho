@@ -25,6 +25,7 @@ import org.maven.ide.eclipse.tests.common.AbstractLifecycleMappingTest;
 public class MavenBundlePluginTest
     extends AbstractLifecycleMappingTest
 {
+
     public void testImport()
         throws Exception
     {
@@ -52,4 +53,21 @@ public class MavenBundlePluginTest
         assertEquals( "org.eclipse.jdt.core.javabuilder", builders[0].getBuilderName() );
         assertEquals( "org.maven.ide.eclipse.maven2Builder", builders[1].getBuilderName() );
     }
+
+    public void testImportDespiteErrorsInExecutionPlan()
+        throws Exception
+    {
+        IMavenProjectFacade facade = importMavenProject( "projects/maven-bundle-plugin/unresolvable-plugin", "pom.xml" );
+
+        // make sure natures are setup right
+        IProject project = facade.getProject();
+        assertTrue( project.hasNature( PDE.PLUGIN_NATURE ) );
+        assertTrue( project.hasNature( IMavenConstants.NATURE_ID ) );
+
+        // make sure PDE builder is not enabled
+        ICommand[] builders = project.getDescription().getBuildSpec();
+        assertEquals( 1, builders.length );
+        assertEquals( "org.maven.ide.eclipse.maven2Builder", builders[0].getBuilderName() );
+    }
+
 }

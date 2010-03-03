@@ -9,8 +9,10 @@
 package org.sonatype.tycho.m2e.internal;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
@@ -60,11 +62,15 @@ public class OsgiBundleProjectConfigurator
     private boolean isOsgiBundleProject( IMavenProjectFacade facade, IProgressMonitor monitor )
         throws CoreException
     {
-        for ( MojoExecution execution : facade.getExecutionPlan( monitor ).getExecutions() )
+        List<Plugin> plugins = facade.getMavenProject( monitor ).getBuildPlugins();
+        if ( plugins != null )
         {
-            if ( isMavenBundlePluginMojo( execution ) )
+            for ( Plugin plugin : plugins )
             {
-                return true;
+                if ( isMavenBundlePluginMojo( plugin ) && !plugin.getExecutions().isEmpty() )
+                {
+                    return true;
+                }
             }
         }
         return false;
@@ -94,6 +100,17 @@ public class OsgiBundleProjectConfigurator
 
     protected boolean isMavenBundlePluginMojo( MojoExecution execution )
     {
-        return MOJO_GROUP_ID.equals( execution.getGroupId() ) && MOJO_ARTIFACT_ID.equals( execution.getArtifactId() );
+        return isMavenBundlePluginMojo( execution.getGroupId(), execution.getArtifactId() );
     }
+
+    private boolean isMavenBundlePluginMojo( Plugin plugin )
+    {
+        return isMavenBundlePluginMojo( plugin.getGroupId(), plugin.getArtifactId() );
+    }
+
+    private boolean isMavenBundlePluginMojo( String groupId, String artifactId )
+    {
+        return MOJO_GROUP_ID.equals( groupId ) && MOJO_ARTIFACT_ID.equals( artifactId );
+    }
+
 }
