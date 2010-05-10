@@ -26,13 +26,10 @@
   <packaging>pom</packaging>
 
   <properties>
-    <m2e.version>0.10.0/N/201002040453/</m2e.version>
+    <m2e.version>0.10.1/S/0.10.1.20100510-1546</m2e.version>
 
-    <tycho-version>0.7.0</tycho-version>
+    <tycho-version>0.8.0</tycho-version>
 
-    <m2e.releases>http://repository.sonatype.org/content/repositories/eclipse/</m2e.releases>
-    <m2e.snapshots>http://repository.sonatype.org/content/repositories/eclipse-snapshots/</m2e.snapshots>
-    <m2e.site>http://localhost</m2e.site>
     <m2e.site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</m2e.site-compressed>
   </properties>
 
@@ -75,21 +72,6 @@
       </releases>
     </pluginRepository>
   </pluginRepositories>
-
-  <distributionManagement>
-    <repository>
-      <id>forge-releases</id>
-      <url>${m2e.releases}</url>
-    </repository>
-    <snapshotRepository>
-      <id>forge-snapshots</id>
-      <url>${m2e.snapshots}</url>
-    </snapshotRepository>
-    <site>
-      <id>m2e-site</id>
-      <url>${m2e.site}</url>
-    </site>
-  </distributionManagement>
 
   <build>
     <plugins>

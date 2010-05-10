@@ -68,9 +68,9 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>com.sonatype.maven.plugins</groupId>
+            <groupId>org.sonatype.plugins</groupId>
             <artifactId>maven-upload-plugin</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.1</version>
             <executions>
               <execution>
                 <id>publish-site</id>
@@ -83,7 +83,7 @@
 
                   <serverId>forge-releases</serverId>
                   <repositoryUrl>${m2e.site-compressed}</repositoryUrl>
-                  <repositoryPath>m2e/m2eclipse-tycho/${unqualifiedVersion}/N/${buildQualifier}</repositoryPath>
+                  <repositoryPath>m2eclipse-tycho/${unqualifiedVersion}/N/${buildQualifier}</repositoryPath>
                 </configuration>
               </execution>
             </executions>
