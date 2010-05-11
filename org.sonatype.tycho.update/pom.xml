@@ -83,7 +83,7 @@
 
                   <serverId>forge-releases</serverId>
                   <repositoryUrl>${m2e.site-compressed}</repositoryUrl>
-                  <repositoryPath>m2eclipse-tycho/0.4.4/S/${project.version}</repositoryPath>
+                  <repositoryPath>m2eclipse-tycho/0.4.0/S/${project.version}</repositoryPath>
                 </configuration>
               </execution>
             </executions>
