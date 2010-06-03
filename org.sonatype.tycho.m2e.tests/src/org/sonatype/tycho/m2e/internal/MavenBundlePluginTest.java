@@ -54,6 +54,12 @@ public class MavenBundlePluginTest
         assertEquals( "org.maven.ide.eclipse.maven2Builder", builders[1].getBuilderName() );
     }
 
+    public void testImportTarget()
+        throws Exception
+    {
+        IMavenProjectFacade facade = importMavenProject( "projects/maven-bundle-plugin/bundleTarget", "pom.xml" );
+    }
+
     public void testImportDespiteErrorsInExecutionPlan()
         throws Exception
     {
