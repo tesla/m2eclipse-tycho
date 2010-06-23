@@ -26,9 +26,9 @@
   <packaging>pom</packaging>
 
   <properties>
-    <m2e.version>0.10.1/S/0.10.1.20100510-1546</m2e.version>
+    <m2e.version>0.10.2/N/0.10.2.201006222031</m2e.version>
 
-    <tycho-version>0.9.0-SNAPSHOT</tycho-version>
+    <tycho-version>0.9.0</tycho-version>
 
     <m2e.site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</m2e.site-compressed>
   </properties>
