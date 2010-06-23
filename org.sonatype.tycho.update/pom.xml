@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.sonatype.tycho.m2e</groupId>
     <artifactId>tycho-m2e-parent</artifactId>
-    <version>0.4.1-SNAPSHOT</version>
+    <version>0.4.1.20100623-1901</version>
   </parent>
 
   <artifactId>org.sonatype.tycho.update</artifactId>
@@ -83,7 +83,7 @@
 
                   <serverId>forge-releases</serverId>
                   <repositoryUrl>${m2e.site-compressed}</repositoryUrl>
-                  <repositoryPath>m2eclipse-tycho/${unqualifiedVersion}/N/${unqualifiedVersion}.${buildQualifier}</repositoryPath>
+                  <repositoryPath>m2eclipse-tycho/${unqualifiedVersion}/S/${unqualifiedVersion}.${buildQualifier}</repositoryPath>
                 </configuration>
               </execution>
             </executions>
