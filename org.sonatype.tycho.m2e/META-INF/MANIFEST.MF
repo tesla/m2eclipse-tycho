@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tycho Project Configurators
 Bundle-SymbolicName: org.sonatype.tycho.m2e;singleton:=true
-Bundle-Version: 0.4.2.qualifier
+Bundle-Version: 0.4.3.qualifier
 Bundle-Activator: org.sonatype.tycho.m2e.internal.Activator
 Bundle-Vendor: Sonatype, Inc.
 Require-Bundle: org.eclipse.core.runtime,
