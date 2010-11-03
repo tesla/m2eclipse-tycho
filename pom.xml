@@ -22,7 +22,7 @@
 
   <groupId>org.sonatype.tycho.m2e</groupId>
   <artifactId>m2eclipse-tycho</artifactId>
-  <version>0.4.3-SNAPSHOT</version>
+  <version>0.4.3.20101103-1630</version>
   <packaging>pom</packaging>
 
   <properties>

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tycho Project Configurators Tests
 Bundle-SymbolicName: org.sonatype.tycho.m2e.tests;singleton:=true
-Bundle-Version: 0.4.3.qualifier
+Bundle-Version: 0.4.3.20101103-1630
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
  JavaSE-1.6
 Bundle-ClassPath: .
