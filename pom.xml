@@ -21,14 +21,14 @@
   </parent>
 
   <groupId>org.sonatype.tycho.m2e</groupId>
-  <artifactId>tycho-m2e-parent</artifactId>
-  <version>0.5.0-SNAPSHOT</version>
+  <artifactId>m2eclipse-tycho</artifactId>
+  <version>0.4.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <properties>
-    <m2e.version>0.10.1/S/0.10.1.20100510-1546</m2e.version>
+    <m2e.version>0.12.0/S/0.12.0.20101102-1505</m2e.version>
 
-    <tycho-version>0.9.0-SNAPSHOT</tycho-version>
+    <tycho-version>0.9.0</tycho-version>
 
     <m2e.site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</m2e.site-compressed>
   </properties>
@@ -46,7 +46,7 @@
     <repository>
       <id>galileo</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/helios</url>
+      <url>http://download.eclipse.org/releases/galileo</url>
     </repository>
     <repository>
       <id>m2e</id>

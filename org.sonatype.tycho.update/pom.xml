@@ -5,8 +5,8 @@
 
   <parent>
     <groupId>org.sonatype.tycho.m2e</groupId>
-    <artifactId>tycho-m2e-parent</artifactId>
-    <version>0.5.0-SNAPSHOT</version>
+    <artifactId>m2eclipse-tycho</artifactId>
+    <version>0.4.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.sonatype.tycho.update</artifactId>
@@ -17,13 +17,6 @@
       <plugin>
         <groupId>org.sonatype.tycho</groupId>
         <artifactId>maven-osgi-packaging-plugin</artifactId>
-        <version>${tycho-version}</version>
-        <configuration>
-          <metadataRepositoryName>Tycho Project Configurators Update
-            Site</metadataRepositoryName>
-          <artifactRepositoryName>Tycho Project Configurators Update
-            Site Artifacts</artifactRepositoryName>
-        </configuration>
         <executions>
           <execution>
             <id>build-qualifier</id>
@@ -33,6 +26,17 @@
             <phase>validate</phase>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.tycho</groupId>
+        <artifactId>maven-osgi-packaging-plugin</artifactId>
+        <configuration>
+          <metadataRepositoryName>Tycho Project Configurators Update
+            Site</metadataRepositoryName>
+          <artifactRepositoryName>Tycho Project Configurators Update
+            Site Artifacts</artifactRepositoryName>
+        </configuration>
       </plugin>
 
       <plugin>
@@ -79,7 +83,7 @@
 
                   <serverId>forge-releases</serverId>
                   <repositoryUrl>${m2e.site-compressed}</repositoryUrl>
-                  <repositoryPath>m2eclipse-tycho/${unqualifiedVersion}/N/${buildQualifier}</repositoryPath>
+                  <repositoryPath>m2eclipse-tycho/${unqualifiedVersion}/N/${unqualifiedVersion}.${buildQualifier}</repositoryPath>
                 </configuration>
               </execution>
             </executions>

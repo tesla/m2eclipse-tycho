@@ -2,7 +2,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>maven-bundle-plugin</groupId>
-  <artifactId>bundle</artifactId>
+  <artifactId>artifact</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
   <build>
@@ -11,7 +11,7 @@
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
           <archive>
-            <manifestFile>${project.basedir}/META-INF/MANIFEST.MF</manifestFile>
+            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
           </archive>
         </configuration>
       </plugin>
