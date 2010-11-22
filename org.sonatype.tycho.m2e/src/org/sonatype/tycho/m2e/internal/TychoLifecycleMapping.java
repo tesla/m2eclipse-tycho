@@ -27,6 +27,12 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.m2e.core.internal.project.CustomizableLifecycleMapping;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.MavenProjectUtils;
+import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
+import org.eclipse.m2e.core.project.configurator.IExtensionLifecycleMapping;
+import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.internal.core.ClasspathComputer;
@@ -35,12 +41,6 @@ import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.pde.internal.core.PluginModelDelta;
 import org.eclipse.pde.internal.core.natures.PDE;
 import org.eclipse.pde.internal.core.util.CoreUtility;
-import org.maven.ide.eclipse.internal.project.CustomizableLifecycleMapping;
-import org.maven.ide.eclipse.project.IMavenProjectFacade;
-import org.maven.ide.eclipse.project.MavenProjectUtils;
-import org.maven.ide.eclipse.project.configurator.AbstractProjectConfigurator;
-import org.maven.ide.eclipse.project.configurator.IExtensionLifecycleMapping;
-import org.maven.ide.eclipse.project.configurator.ProjectConfigurationRequest;
 
 @SuppressWarnings( "restriction" )
 public class TychoLifecycleMapping
@@ -198,7 +198,7 @@ public class TychoLifecycleMapping
         throws CoreException
     {
         MavenProject mavenProject = facade.getMavenProject( monitor );
-        Plugin plugin = mavenProject.getPlugin( "org.maven.ide.eclipse:lifecycle-mapping" );
+        Plugin plugin = mavenProject.getPlugin( "org.eclipse.m2e:lifecycle-mapping" );
 
         if ( plugin == null )
         {

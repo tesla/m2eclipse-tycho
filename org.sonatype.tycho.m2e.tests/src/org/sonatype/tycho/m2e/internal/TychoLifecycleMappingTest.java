@@ -13,13 +13,13 @@ import java.io.File;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
+import org.eclipse.m2e.tests.common.AbstractLifecycleMappingTest;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.internal.core.ClasspathComputer;
 import org.eclipse.pde.internal.core.natures.PDE;
-import org.maven.ide.eclipse.project.IMavenProjectFacade;
-import org.maven.ide.eclipse.project.configurator.ILifecycleMapping;
-import org.maven.ide.eclipse.tests.common.AbstractLifecycleMappingTest;
 
 @SuppressWarnings( "restriction" )
 public class TychoLifecycleMappingTest

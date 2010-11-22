@@ -15,11 +15,11 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.jdt.BuildPathManager;
+import org.eclipse.m2e.tests.common.AbstractLifecycleMappingTest;
 import org.eclipse.pde.internal.core.natures.PDE;
-import org.maven.ide.eclipse.core.IMavenConstants;
-import org.maven.ide.eclipse.jdt.BuildPathManager;
-import org.maven.ide.eclipse.project.IMavenProjectFacade;
-import org.maven.ide.eclipse.tests.common.AbstractLifecycleMappingTest;
 
 @SuppressWarnings( "restriction" )
 public class MavenBundlePluginTest
@@ -51,7 +51,7 @@ public class MavenBundlePluginTest
         ICommand[] builders = project.getDescription().getBuildSpec();
         assertEquals( 2, builders.length );
         assertEquals( "org.eclipse.jdt.core.javabuilder", builders[0].getBuilderName() );
-        assertEquals( "org.maven.ide.eclipse.maven2Builder", builders[1].getBuilderName() );
+        assertEquals( "org.eclipse.m2e.core.maven2Builder", builders[1].getBuilderName() );
     }
 
     public void testImportDespiteErrorsInExecutionPlan()
@@ -66,8 +66,10 @@ public class MavenBundlePluginTest
 
         // make sure PDE builder is not enabled
         ICommand[] builders = project.getDescription().getBuildSpec();
-        assertEquals( 1, builders.length );
-        assertEquals( "org.maven.ide.eclipse.maven2Builder", builders[0].getBuilderName() );
+        assertEquals( 2, builders.length );
+        for (int i = 0; i < builders.length; i++) {
+			assertFalse( builders[i].getBuilderName().equals(PDE.MANIFEST_BUILDER_ID) );
+		}
     }
 
 }

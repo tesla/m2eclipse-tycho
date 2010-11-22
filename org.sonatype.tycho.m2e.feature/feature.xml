@@ -2,7 +2,7 @@
 <feature
       id="org.sonatype.tycho.m2e.feature"
       label="Tycho Project Configurators"
-      version="0.4.4.qualifier"
+      version="0.5.0.qualifier"
       provider-name="Sonatype, Inc.">
 
    <description url="https://docs.sonatype.org/display/M2ECLIPSE/Tycho+project+overview">
@@ -22,8 +22,6 @@ http://www.eclipse.org/legal/epl-v10.html
 
    <requires>
       <import plugin="org.eclipse.core.runtime" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.maven.ide.eclipse" version="0.10.0" match="greaterOrEqual"/>
-      <import plugin="org.maven.ide.eclipse.maven_embedder" version="0.10.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.pde.core" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt.core" version="3.4.0" match="greaterOrEqual"/>

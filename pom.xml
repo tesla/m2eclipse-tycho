@@ -22,13 +22,13 @@
 
   <groupId>org.sonatype.tycho.m2e</groupId>
   <artifactId>m2eclipse-tycho</artifactId>
-  <version>0.4.4-SNAPSHOT</version>
+  <version>0.5.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <properties>
-    <m2e.version>0.12.0/S/0.12.0.20101102-1505</m2e.version>
+    <m2e.version>0.13.0/N/0.13.0.201011191357/</m2e.version>
 
-    <tycho-version>0.9.0</tycho-version>
+    <tycho-version>0.10.0</tycho-version>
 
     <m2e.site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</m2e.site-compressed>
   </properties>
