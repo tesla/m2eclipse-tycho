@@ -26,7 +26,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <m2e.version>0.13.0/N/0.13.0.201011191357/</m2e.version>
+    <m2e.version>0.13.0/N/0.13.0.201011301308/</m2e.version>
 
     <tycho-version>0.10.0</tycho-version>
 

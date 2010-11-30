@@ -30,9 +30,11 @@ public class MavenBundlePluginTest
         throws Exception
     {
         IMavenProjectFacade facade = importMavenProject( "projects/maven-bundle-plugin/bundle", "pom.xml" );
+        assertNotNull( "Expected not null maven project facade", facade );
 
         // make sure natures are setup right
         IProject project = facade.getProject();
+        assertNotNull( "Expected not null project", project );
         assertTrue( project.hasNature( PDE.PLUGIN_NATURE ) );
         assertTrue( project.hasNature( JavaCore.NATURE_ID ) );
         assertTrue( project.hasNature( IMavenConstants.NATURE_ID ) );
@@ -45,6 +47,7 @@ public class MavenBundlePluginTest
 
         // make sure manifest is generated properly
         project.build( IncrementalProjectBuilder.FULL_BUILD, monitor );
+        waitForJobsToComplete();
         assertTrue( project.getFile( "META-INF/MANIFEST.MF" ).isAccessible() );
 
         // make sure PDE builder is not enabled
@@ -66,10 +69,7 @@ public class MavenBundlePluginTest
 
         // make sure PDE builder is not enabled
         ICommand[] builders = project.getDescription().getBuildSpec();
-        assertEquals( 2, builders.length );
-        for (int i = 0; i < builders.length; i++) {
-			assertFalse( builders[i].getBuilderName().equals(PDE.MANIFEST_BUILDER_ID) );
-		}
+        assertEquals( 1, builders.length );
+        assertEquals( "org.eclipse.m2e.core.maven2Builder", builders[0].getBuilderName() );
     }
-
 }

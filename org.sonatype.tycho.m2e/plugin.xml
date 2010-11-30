@@ -44,9 +44,9 @@
          point="org.eclipse.m2e.core.projectConfigurators">
       <configurator
             class="org.sonatype.tycho.m2e.internal.OsgiBundleProjectConfigurator"
-            generic="true"
             id="maven-bundle-plugin"
-            name="Project Configurator for maven-bundle-plugin osgi-bundle projects">
+            name="Project Configurator for maven-bundle-plugin osgi-bundle projects"
+            requiresExplicitEnablement="false">
       </configurator>
    </extension>
 
