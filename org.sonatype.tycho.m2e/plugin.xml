@@ -13,41 +13,47 @@
          point="org.eclipse.m2e.core.lifecycleMappings">
       <lifecycleMapping
             class="org.sonatype.tycho.m2e.internal.TychoLifecycleMapping"
-            id="org.sonatype.tycho.m2e.tychoLifecycleMapping"
-            name="Tycho Build Lifecycle Mapping">
+            id="org.sonatype.tycho.m2e.tychoLifecycleMapping.eclipse-plugin"
+            name="Tycho Build Lifecycle Mapping for eclipse-plugin"
+            packaging-type="eclipse-plugin">
       </lifecycleMapping>
-   </extension>
-   <extension
-         point="org.eclipse.m2e.core.defaultLifecycleMappings">
-      <defaultLifecycleMapping
-            id="org.sonatype.tycho.m2e.eclipse-plugin"
-            lifecycleMappingId="org.sonatype.tycho.m2e.tychoLifecycleMapping"
-            packaging="eclipse-plugin"/>
-      <defaultLifecycleMapping
-            id="org.sonatype.tycho.m2e.eclipse-test-plugin"
-            lifecycleMappingId="org.sonatype.tycho.m2e.tychoLifecycleMapping"
-            packaging="eclipse-test-plugin"/>
-      <defaultLifecycleMapping
-            id="org.sonatype.tycho.m2e.eclipse-feature"
-            lifecycleMappingId="org.sonatype.tycho.m2e.tychoLifecycleMapping"
-            packaging="eclipse-feature"/>
-      <defaultLifecycleMapping
-            id="org.sonatype.tycho.m2e.eclipse-update-site"
-            lifecycleMappingId="org.sonatype.tycho.m2e.tychoLifecycleMapping"
-            packaging="eclipse-update-site"/>
-      <defaultLifecycleMapping
-            id="org.sonatype.tycho.m2e.eclipse-application"
-            lifecycleMappingId="org.sonatype.tycho.m2e.tychoLifecycleMapping"
-            packaging="eclipse-application"/>
+      <lifecycleMapping
+            class="org.sonatype.tycho.m2e.internal.TychoLifecycleMapping"
+            id="org.sonatype.tycho.m2e.tychoLifecycleMapping.eclipse-test-plugin"
+            name="Tycho Build Lifecycle Mapping for eclipse-test-plugin"
+            packaging-type="eclipse-test-plugin">
+      </lifecycleMapping>
+      <lifecycleMapping
+            class="org.sonatype.tycho.m2e.internal.TychoLifecycleMapping"
+            id="org.sonatype.tycho.m2e.tychoLifecycleMapping.eclipse-feature"
+            name="Tycho Build Lifecycle Mapping for eclipse-feature"
+            packaging-type="eclipse-feature">
+      </lifecycleMapping>
+      <lifecycleMapping
+            class="org.sonatype.tycho.m2e.internal.TychoLifecycleMapping"
+            id="org.sonatype.tycho.m2e.tychoLifecycleMapping.eclipse-update-site"
+            name="Tycho Build Lifecycle Mapping for eclipse-update-site"
+            packaging-type="eclipse-update-site">
+      </lifecycleMapping>
+      <lifecycleMapping
+            class="org.sonatype.tycho.m2e.internal.TychoLifecycleMapping"
+            id="org.sonatype.tycho.m2e.tychoLifecycleMapping.eclipse-application"
+            name="Tycho Build Lifecycle Mapping for eclipse-application"
+            packaging-type="eclipse-application">
+      </lifecycleMapping>
    </extension>
    <extension
          point="org.eclipse.m2e.core.projectConfigurators">
       <configurator
             class="org.sonatype.tycho.m2e.internal.OsgiBundleProjectConfigurator"
             id="maven-bundle-plugin"
-            name="Project Configurator for maven-bundle-plugin osgi-bundle projects"
-            requiresExplicitEnablement="false">
+            name="Project Configurator for maven-bundle-plugin osgi-bundle projects">
+         <mojo
+               groupId="org.apache.felix"
+               artifactId="maven-bundle-plugin"
+               goals="manifest"
+               versionRange="[1.0.0,)">
+         </mojo>
       </configurator>
    </extension>
-
 </plugin>

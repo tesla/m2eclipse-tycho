@@ -27,11 +27,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.m2e.core.internal.project.CustomizableLifecycleMapping;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
-import org.eclipse.m2e.core.project.configurator.IExtensionLifecycleMapping;
+import org.eclipse.m2e.core.project.configurator.CustomizableLifecycleMapping;
+import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
@@ -45,7 +45,7 @@ import org.eclipse.pde.internal.core.util.CoreUtility;
 @SuppressWarnings( "restriction" )
 public class TychoLifecycleMapping
     extends CustomizableLifecycleMapping
-    implements IExtensionLifecycleMapping
+    implements ILifecycleMapping
 {
     private static boolean isListeningForPluginModelChanges = false;
     private static final List<IProject> projectsForUpdateClasspath = new ArrayList<IProject>();

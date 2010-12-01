@@ -19,6 +19,7 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.jdt.BuildPathManager;
 import org.eclipse.m2e.tests.common.AbstractLifecycleMappingTest;
+import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.eclipse.pde.internal.core.natures.PDE;
 
 @SuppressWarnings( "restriction" )
@@ -35,6 +36,7 @@ public class MavenBundlePluginTest
         // make sure natures are setup right
         IProject project = facade.getProject();
         assertNotNull( "Expected not null project", project );
+        WorkspaceHelpers.assertNoErrors( project );
         assertTrue( project.hasNature( PDE.PLUGIN_NATURE ) );
         assertTrue( project.hasNature( JavaCore.NATURE_ID ) );
         assertTrue( project.hasNature( IMavenConstants.NATURE_ID ) );
