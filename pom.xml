@@ -26,7 +26,9 @@
   <packaging>pom</packaging>
 
   <properties>
-    <m2e.version>0.13.0/N/0.13.0.201012011004</m2e.version>
+    <m2e.version>0.13.0/N/0.13.0.201012171636</m2e.version>
+    <m2e-extras.version>0.12.1/N/0.12.1.201012151104</m2e-extras.version>
+    <orbit.version>S20101014084557</orbit.version>
 
     <tycho-version>0.10.0</tycho-version>
 
@@ -49,6 +51,11 @@
       <url>http://download.eclipse.org/releases/galileo</url>
     </repository>
     <repository>
+      <id>orbit</id>
+      <layout>p2</layout>
+      <url>http://download.eclipse.org/tools/orbit/downloads/drops/${orbit.version}/repository</url>
+    </repository>
+    <repository>
       <id>m2e</id>
       <layout>p2</layout>
       <url>http://repository.sonatype.org/content/sites/forge-sites/m2e/${m2e.version}</url>
@@ -56,7 +63,7 @@
     <repository>
       <id>m2e-extras</id>
       <layout>p2</layout>
-      <url>http://repository.sonatype.org/content/sites/forge-sites/m2e-extras/${m2e.version}</url>
+      <url>http://repository.sonatype.org/content/sites/forge-sites/m2e-extras/${m2e-extras.version}</url>
     </repository>
   </repositories>
 
