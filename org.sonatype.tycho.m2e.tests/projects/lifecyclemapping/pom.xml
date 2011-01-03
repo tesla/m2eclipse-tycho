@@ -20,15 +20,6 @@
         <version>${tycho-version}</version>
         <extensions>true</extensions>
       </plugin>
-      <plugin>
-        <groupId>org.maven.ide.eclipse</groupId>
-        <artifactId>lifecycle-mapping</artifactId>
-        <version>${m2e-version}</version>
-        <configuration>
-          <mappingId>org.sonatype.tycho.m2e.tychoLifecycleMapping</mappingId>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
-
 </project>
