@@ -48,12 +48,14 @@
             class="org.sonatype.tycho.m2e.internal.OsgiBundleProjectConfigurator"
             id="maven-bundle-plugin"
             name="Project Configurator for maven-bundle-plugin osgi-bundle projects">
-         <mojo
-               groupId="org.apache.felix"
-               artifactId="maven-bundle-plugin"
-               goals="manifest"
-               versionRange="[1.0.0,)">
-         </mojo>
+         <pluginExecutionFilter>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>maven-bundle-plugin</artifactId>
+            <versionRange>[1.0.0,)</versionRange>
+            <goals>
+               <goal>manifest</goal>
+            </goals>
+         </pluginExecutionFilter>
       </configurator>
    </extension>
 </plugin>
