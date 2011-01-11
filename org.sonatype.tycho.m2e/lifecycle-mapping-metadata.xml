@@ -56,17 +56,31 @@
     <pluginExecution>
       <pluginExecutionFilter>
         <groupId>org.sonatype.tycho</groupId>
+        <artifactId>maven-osgi-compiler-plugin</artifactId>
+        <versionRange>[0.9.0,)</versionRange>
+        <goals>
+          <goal>compile</goal>
+          <goal>testCompile</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.sonatype.tycho</groupId>
         <artifactId>maven-osgi-packaging-plugin</artifactId>
         <versionRange>[0.9.0,)</versionRange>
         <goals>
           <goal>build-qualifier</goal>
+          <goal>validate-version</goal>
         </goals>
       </pluginExecutionFilter>
       <action>
-        <ignore/>
+        <ignore />
       </action>
     </pluginExecution>
-    
 
     <!-- maven-bundle-plugin mojos -->
     <pluginExecution>
