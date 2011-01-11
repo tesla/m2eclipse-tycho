@@ -99,6 +99,16 @@
         </configuration>
       </plugin>
     </plugins>
+	<pluginManagement>
+	  <plugins>
+        <!-- important for self-hosting -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.4.3</version>
+        </plugin>
+	  </plugins>
+	</pluginManagement>
   </build>
 
   <profiles>
