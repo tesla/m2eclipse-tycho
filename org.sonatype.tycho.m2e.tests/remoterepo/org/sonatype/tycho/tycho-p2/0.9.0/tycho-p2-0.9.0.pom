@@ -1,0 +1,85 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.tycho</groupId>
+    <artifactId>tycho</artifactId>
+    <version>0.9.0</version>
+  </parent>
+
+  <groupId>org.sonatype.tycho</groupId>
+  <artifactId>tycho-p2</artifactId>
+  <packaging>pom</packaging>
+  <name>Tycho P2-based target platform resolver parent</name>
+  
+  <modules>
+    <module>org.sonatype.tycho.p2.impl</module>
+    <module>org.sonatype.tycho.p2.maven.repository</module>
+    <module>tycho-p2-facade</module>
+    <module>tycho-p2-runtime</module>
+<!-- 
+    <module>org.sonatype.tycho.p2.impl.test</module>
+    <module>org.sonatype.tycho.p2.maven.repository.tests</module>
+ -->
+    <module>tycho-p2-plugin</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-annotations</artifactId>
+        <version>${plexusVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-container-default</artifactId>
+        <version>${plexusVersion}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.tycho</groupId>
+        <artifactId>org.eclipse.osgi</artifactId>
+        <version>${equinoxVersion}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+          <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>m2e</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.maven.ide.eclipse</groupId>
+            <artifactId>lifecycle-mapping</artifactId>
+            <version>0.10.0</version>
+            <configuration>
+              <mappingId>org.sonatype.tycho.m2e.tychoLifecycleMapping</mappingId>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

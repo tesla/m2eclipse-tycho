@@ -9,13 +9,18 @@
 package org.sonatype.tycho.m2e.internal;
 
 import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.jdt.BuildPathManager;
 import org.eclipse.m2e.tests.common.AbstractLifecycleMappingTest;
@@ -26,11 +31,25 @@ import org.eclipse.pde.internal.core.natures.PDE;
 public class MavenBundlePluginTest
     extends AbstractLifecycleMappingTest
 {
+    
+    @Override
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+        LifecycleMappingFactory.setUseDefaultLifecycleMappingMetadataSource(true);
+    }
 
     public void testImport()
         throws Exception
     {
         IMavenProjectFacade facade = importMavenProject( "projects/maven-bundle-plugin/bundle", "pom.xml" );
+        assertPDEPluginProject( facade );
+    }
+
+    private void assertPDEPluginProject( IMavenProjectFacade facade )
+        throws CoreException, JavaModelException, InterruptedException
+    {
         assertNotNull( "Expected not null maven project facade", facade );
 
         // make sure natures are setup right
@@ -59,7 +78,8 @@ public class MavenBundlePluginTest
         assertEquals( "org.eclipse.m2e.core.maven2Builder", builders[1].getBuilderName() );
     }
 
-    public void testImportDespiteErrorsInExecutionPlan()
+    // XXX disabled due to https://issues.sonatype.org/browse/MNGECLIPSE-2724
+    public void _testImportDespiteErrorsInExecutionPlan()
         throws Exception
     {
         IMavenProjectFacade facade = importMavenProject( "projects/maven-bundle-plugin/unresolvable-plugin", "pom.xml" );
@@ -73,5 +93,17 @@ public class MavenBundlePluginTest
         ICommand[] builders = project.getDescription().getBuildSpec();
         assertEquals( 1, builders.length );
         assertEquals( "org.eclipse.m2e.core.maven2Builder", builders[0].getBuilderName() );
+    }
+
+    public void testImportProjectWithBundlePackaging()
+        throws Exception
+    {
+        IMavenProjectFacade facade = importMavenProject( "projects/maven-bundle-plugin/bundle-packaging", "pom.xml" );
+        assertPDEPluginProject( facade );
+
+        // make sure full bundle is not packaged during workspace build
+        IFile bundle = facade.getProject().getFile( "target/bundle-packaging-0.0.1-SNAPSHOT.jar" );
+        bundle.refreshLocal( IResource.DEPTH_ZERO, monitor );
+        assertFalse( bundle.exists() );
     }
 }

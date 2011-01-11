@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -81,6 +82,24 @@ public class OsgiBundleProjectConfigurator
     {
         if ( isMavenBundlePluginMojo( execution ) )
         {
+            if ( "bundle".equals( execution.getGoal() ) )
+            {
+                // do not generate complete bundle. this is both slow and can produce unexpected workspace changes
+                // that will trigger unexpected/endless workspace build.
+                // we rely on the fact that ManifestPlugin mojo extends BundlePlugin and does not introduce any
+                // additional parameters, so can run manifest goal in place of bundle goal.
+                MojoDescriptor descriptor = execution.getMojoDescriptor().clone();
+                descriptor.setGoal( "manifest" );
+                descriptor.setImplementation( "org.apache.felix.bundleplugin.ManifestPlugin" );
+                MojoExecution _execution =
+                    new MojoExecution( execution.getPlugin(), "manifest", "tycho-m2e:" + execution.getExecutionId()
+                        + ":manifest" );
+                _execution.setConfiguration( execution.getConfiguration() );
+                _execution.setMojoDescriptor( descriptor );
+                _execution.setLifecyclePhase( execution.getLifecyclePhase() );
+                execution = _execution;
+            }
+
             return new MojoExecutionBuildParticipant( execution, false )
             {
                 @Override

@@ -21,6 +21,25 @@
           </pluginRepository>
         </pluginRepositories>
     </profile>
+    <profile>
+      <id>rso</id>
+        <repositories>
+          <repository>
+            <id>central</id>
+            <url>https://repository.sonatype.org/content/repositories/central/</url>
+            <snapshots><enabled>true</enabled></snapshots>
+            <releases><enabled>true</enabled></releases>
+          </repository>
+        </repositories>
+        <pluginRepositories>
+          <pluginRepository>
+            <id>central</id>
+            <url>https://repository.sonatype.org/content/repositories/central/</url>
+            <snapshots><enabled>true</enabled></snapshots>
+            <releases><enabled>true</enabled></releases>
+          </pluginRepository>
+        </pluginRepositories>
+    </profile>
   </profiles>
 
   <activeProfiles>

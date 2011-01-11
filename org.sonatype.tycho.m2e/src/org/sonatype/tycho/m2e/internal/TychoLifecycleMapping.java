@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -27,10 +26,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
-import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
-import org.eclipse.m2e.core.project.configurator.CustomizableLifecycleMapping;
+import org.eclipse.m2e.core.project.configurator.AbstractCustomizableLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
@@ -44,7 +41,7 @@ import org.eclipse.pde.internal.core.util.CoreUtility;
 
 @SuppressWarnings( "restriction" )
 public class TychoLifecycleMapping
-    extends CustomizableLifecycleMapping
+    extends AbstractCustomizableLifecycleMapping
     implements ILifecycleMapping
 {
     private static boolean isListeningForPluginModelChanges = false;
@@ -190,22 +187,5 @@ public class TychoLifecycleMapping
         IFolder folder = project.getFolder( relPath );
         folder.refreshLocal( IResource.DEPTH_INFINITE, monitor );
         return folder.getFullPath();
-    }
-
-    @Override
-    public List<AbstractProjectConfigurator> getProjectConfigurators( IMavenProjectFacade facade,
-                                                                      IProgressMonitor monitor )
-        throws CoreException
-    {
-        MavenProject mavenProject = facade.getMavenProject( monitor );
-        Plugin plugin = mavenProject.getPlugin( "org.eclipse.m2e:lifecycle-mapping" );
-
-        if ( plugin == null )
-        {
-            // it is okay to have no mapping
-            return new ArrayList<AbstractProjectConfigurator>();
-        }
-
-        return super.getProjectConfigurators( facade, monitor );
     }
 }
