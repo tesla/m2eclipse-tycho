@@ -17,6 +17,7 @@ import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.tests.common.AbstractLifecycleMappingTest;
+import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.internal.core.ClasspathComputer;
@@ -41,10 +42,11 @@ public class TychoLifecycleMappingTest
 
         IMavenProjectFacade facade = importMavenProject( basedir, pomName );
         assertNotNull( facade );
+        WorkspaceHelpers.assertNoErrors( facade.getProject() );
         ILifecycleMapping lifecycleMapping = projectConfigurationManager.getLifecycleMapping( facade, monitor );
 
-        assertNotNull( lifecycleMapping );
-        assertTrue( lifecycleMapping instanceof TychoLifecycleMapping );
+        assertNotNull( "Expected not null lifecycleMapping", lifecycleMapping );
+        assertTrue( lifecycleMapping.getClass().getName(), lifecycleMapping instanceof TychoLifecycleMapping );
 
         return facade;
     }
