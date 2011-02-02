@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -41,23 +42,24 @@ public class OsgiBundleProjectConfigurator
     public void configure( ProjectConfigurationRequest request, IProgressMonitor monitor )
         throws CoreException
     {
-        if ( isOsgiBundleProject( request.getMavenProjectFacade(), monitor ) )
+        if ( !isOsgiBundleProject( request.getMavenProjectFacade(), monitor ) )
         {
-            IProject project = request.getProject();
-            addNature( project, PDE.PLUGIN_NATURE, monitor );
-            IProjectDescription description = project.getDescription();
-            ICommand[] prevBuilders = description.getBuildSpec();
-            ArrayList<ICommand> newBuilders = new ArrayList<ICommand>();
-            for ( ICommand builder : prevBuilders )
-            {
-                if ( !builder.getBuilderName().startsWith( "org.eclipse.pde" ) )
-                {
-                    newBuilders.add( builder );
-                }
-            }
-            description.setBuildSpec( newBuilders.toArray( new ICommand[newBuilders.size()] ) );
-            project.setDescription( description, monitor );
+            throw new IllegalArgumentException();
         }
+        IProject project = request.getProject();
+        addNature( project, PDE.PLUGIN_NATURE, monitor );
+        IProjectDescription description = project.getDescription();
+        ICommand[] prevBuilders = description.getBuildSpec();
+        ArrayList<ICommand> newBuilders = new ArrayList<ICommand>();
+        for ( ICommand builder : prevBuilders )
+        {
+            if ( !builder.getBuilderName().startsWith( "org.eclipse.pde" ) )
+            {
+                newBuilders.add( builder );
+            }
+        }
+        description.setBuildSpec( newBuilders.toArray( new ICommand[newBuilders.size()] ) );
+        project.setDescription( description, monitor );
     }
 
     private boolean isOsgiBundleProject( IMavenProjectFacade facade, IProgressMonitor monitor )
@@ -78,43 +80,44 @@ public class OsgiBundleProjectConfigurator
     }
 
     @Override
-    public AbstractBuildParticipant getBuildParticipant( MojoExecution execution )
+    public AbstractBuildParticipant getBuildParticipant( IMavenProjectFacade projectFacade, MojoExecution execution,
+                                                         PluginExecutionMetadata executionMetadata )
     {
-        if ( isMavenBundlePluginMojo( execution ) )
+        if ( !isMavenBundlePluginMojo( execution ) )
         {
-            if ( "bundle".equals( execution.getGoal() ) )
-            {
-                // do not generate complete bundle. this is both slow and can produce unexpected workspace changes
-                // that will trigger unexpected/endless workspace build.
-                // we rely on the fact that ManifestPlugin mojo extends BundlePlugin and does not introduce any
-                // additional parameters, so can run manifest goal in place of bundle goal.
-                MojoDescriptor descriptor = execution.getMojoDescriptor().clone();
-                descriptor.setGoal( "manifest" );
-                descriptor.setImplementation( "org.apache.felix.bundleplugin.ManifestPlugin" );
-                MojoExecution _execution =
-                    new MojoExecution( execution.getPlugin(), "manifest", "tycho-m2e:" + execution.getExecutionId()
-                        + ":manifest" );
-                _execution.setConfiguration( execution.getConfiguration() );
-                _execution.setMojoDescriptor( descriptor );
-                _execution.setLifecyclePhase( execution.getLifecyclePhase() );
-                execution = _execution;
-            }
-
-            return new MojoExecutionBuildParticipant( execution, false )
-            {
-                @Override
-                public Set<IProject> build( int kind, IProgressMonitor monitor )
-                    throws Exception
-                {
-                    Set<IProject> projects = super.build( kind, monitor );
-                    IFile file = getMavenProjectFacade().getProject().getFile( "META-INF/MANIFEST.MF" );
-                    file.refreshLocal( IResource.DEPTH_ZERO, monitor );
-                    return projects;
-                }
-            };
+            throw new IllegalArgumentException();
         }
 
-        return null;
+        if ( "bundle".equals( execution.getGoal() ) )
+        {
+            // do not generate complete bundle. this is both slow and can produce unexpected workspace changes
+            // that will trigger unexpected/endless workspace build.
+            // we rely on the fact that ManifestPlugin mojo extends BundlePlugin and does not introduce any
+            // additional parameters, so can run manifest goal in place of bundle goal.
+            MojoDescriptor descriptor = execution.getMojoDescriptor().clone();
+            descriptor.setGoal( "manifest" );
+            descriptor.setImplementation( "org.apache.felix.bundleplugin.ManifestPlugin" );
+            MojoExecution _execution =
+                new MojoExecution( execution.getPlugin(), "manifest", "tycho-m2e:" + execution.getExecutionId()
+                    + ":manifest" );
+            _execution.setConfiguration( execution.getConfiguration() );
+            _execution.setMojoDescriptor( descriptor );
+            _execution.setLifecyclePhase( execution.getLifecyclePhase() );
+            execution = _execution;
+        }
+
+        return new MojoExecutionBuildParticipant( execution, false )
+        {
+            @Override
+            public Set<IProject> build( int kind, IProgressMonitor monitor )
+                throws Exception
+            {
+                Set<IProject> projects = super.build( kind, monitor );
+                IFile file = getMavenProjectFacade().getProject().getFile( "META-INF/MANIFEST.MF" );
+                file.refreshLocal( IResource.DEPTH_ZERO, monitor );
+                return projects;
+            }
+        };
     }
 
     protected boolean isMavenBundlePluginMojo( MojoExecution execution )

@@ -43,7 +43,7 @@ public class TychoLifecycleMappingTest
         IMavenProjectFacade facade = importMavenProject( basedir, pomName );
         assertNotNull( facade );
         WorkspaceHelpers.assertNoErrors( facade.getProject() );
-        ILifecycleMapping lifecycleMapping = projectConfigurationManager.getLifecycleMapping( facade, monitor );
+        ILifecycleMapping lifecycleMapping = projectConfigurationManager.getLifecycleMapping( facade );
 
         assertNotNull( "Expected not null lifecycleMapping", lifecycleMapping );
         assertTrue( lifecycleMapping.getClass().getName(), lifecycleMapping instanceof TychoLifecycleMapping );
