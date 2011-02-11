@@ -22,7 +22,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.jdt.BuildPathManager;
+import org.eclipse.m2e.jdt.internal.BuildPathManager;
 import org.eclipse.m2e.tests.common.AbstractLifecycleMappingTest;
 import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.eclipse.pde.internal.core.natures.PDE;

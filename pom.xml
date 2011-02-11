@@ -26,7 +26,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <m2e.version>0.13.0/N/0.13.0.201102021501</m2e.version>
+    <m2e.version>0.13.0/N/0.13.0.201102101805</m2e.version>
     <m2e-extras.version>0.13.0/N/0.13.0.201102021542</m2e-extras.version>
     <orbit.version>S20101014084557</orbit.version>
 
