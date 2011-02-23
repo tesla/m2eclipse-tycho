@@ -20,7 +20,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.jdt.internal.BuildPathManager;
 import org.eclipse.m2e.tests.common.AbstractLifecycleMappingTest;
@@ -31,15 +30,6 @@ import org.eclipse.pde.internal.core.natures.PDE;
 public class MavenBundlePluginTest
     extends AbstractLifecycleMappingTest
 {
-    
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        LifecycleMappingFactory.setUseDefaultLifecycleMappingMetadataSource(true);
-    }
-
     public void testImport()
         throws Exception
     {

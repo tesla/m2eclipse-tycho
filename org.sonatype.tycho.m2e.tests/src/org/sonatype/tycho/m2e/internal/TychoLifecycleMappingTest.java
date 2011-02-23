@@ -13,7 +13,6 @@ import java.io.File;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.tests.common.AbstractLifecycleMappingTest;
@@ -27,14 +26,6 @@ import org.eclipse.pde.internal.core.natures.PDE;
 public class TychoLifecycleMappingTest
     extends AbstractLifecycleMappingTest
 {
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        LifecycleMappingFactory.setUseDefaultLifecycleMappingMetadataSource( true );
-    }
-
     private IMavenProjectFacade importProjectAndAssertLifecycleMappingType( String basedir, String pomName )
         throws Exception
     {
