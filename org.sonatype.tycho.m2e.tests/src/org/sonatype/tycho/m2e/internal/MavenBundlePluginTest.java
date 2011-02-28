@@ -21,7 +21,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.jdt.internal.BuildPathManager;
+import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.tests.common.AbstractLifecycleMappingTest;
 import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.eclipse.pde.internal.core.natures.PDE;
@@ -54,7 +54,7 @@ public class MavenBundlePluginTest
         IJavaProject javaProject = JavaCore.create( project );
         IClasspathEntry[] cp = javaProject.getRawClasspath();
         assertEquals( 3, cp.length );
-        assertEquals( new Path( BuildPathManager.CONTAINER_ID ), cp[2].getPath() );
+        assertEquals( new Path( IClasspathManager.CONTAINER_ID ), cp[2].getPath() );
 
         // make sure manifest is generated properly
         project.build( IncrementalProjectBuilder.FULL_BUILD, monitor );
