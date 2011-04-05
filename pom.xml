@@ -26,8 +26,8 @@
   <packaging>pom</packaging>
 
   <properties>
-    <m2e.version>0.13.0/N/0.13.0.201103151108</m2e.version>
-    <m2e-extras.version>0.13.0/N/0.13.0.201103161122</m2e-extras.version>
+    <m2e.version>0.13.0/N/0.13.0.201104051512</m2e.version>
+    <m2e-extras.version>0.13.0/N/0.13.0.201104051625</m2e-extras.version>
     <orbit.version>S20110304120314</orbit.version>
 
     <tycho-version>0.10.0</tycho-version>
@@ -46,9 +46,9 @@
 
   <repositories>
     <repository>
-      <id>galileo</id>
+      <id>helios</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/galileo</url>
+      <url>http://download.eclipse.org/releases/helios</url>
     </repository>
     <repository>
       <id>orbit</id>
