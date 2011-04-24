@@ -83,6 +83,37 @@
       </action>
     </pluginExecution>
 
+    <!--  Tycho 0.12 mojos -->
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-compiler-plugin</artifactId>
+        <versionRange>[0.12.0,)</versionRange>
+        <goals>
+          <goal>compile</goal>
+          <goal>testCompile</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-packaging-plugin</artifactId>
+        <versionRange>[0.12.0,)</versionRange>
+        <goals>
+          <goal>build-qualifier</goal>
+          <goal>validate-version</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+
+
     <!-- maven-bundle-plugin mojos -->
     <pluginExecution>
       <pluginExecutionFilter>
