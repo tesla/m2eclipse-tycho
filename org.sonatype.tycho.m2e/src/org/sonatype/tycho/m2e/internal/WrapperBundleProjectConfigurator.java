@@ -11,7 +11,10 @@ import static org.sonatype.tycho.m2e.internal.AbstractMavenBundlePluginProjectCo
 import static org.sonatype.tycho.m2e.internal.AbstractMavenBundlePluginProjectConfigurator.MOJO_GROUP_ID;
 import static org.sonatype.tycho.m2e.internal.AbstractMavenBundlePluginProjectConfigurator.isOsgiBundleProject;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.jar.Attributes;
@@ -28,10 +31,10 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
@@ -170,17 +173,47 @@ public class WrapperBundleProjectConfigurator
             String path = me.getValue();
             if ( !".".equals( path ) )
             {
-                // create linked resource to make PDE launch configuration happy
+                // physically copy nested jars to make PDE launch configuration happy
                 // otherwise it does not include our classpath entries to dev.properties file
+                // or Bundle.getEntry does not work for the nested jars, if they are linked workspace resources
 
-                IFile file = project.getFile( path );
-                file.createLink( Path.fromOSString( new File( outputDirectory, path ).getAbsolutePath() ),
-                                 IResource.ALLOW_MISSING_LOCAL | IResource.REPLACE, monitor );
+                IFile file = createWorkspaceFile( project, outputDirectory, path, monitor );
 
                 IClasspathEntryDescriptor ed = classpath.addLibraryEntry( file.getFullPath() );
                 ed.setExported( true );
             }
         }
+    }
+
+    protected IFile createWorkspaceFile( IProject targetProject, File sourceDir, String relPath,
+                                         IProgressMonitor monitor )
+        throws CoreException, FileNotFoundException
+    {
+        IFile file = targetProject.getFile( relPath );
+        if ( file.getParent() instanceof IFolder )
+        {
+            M2EUtils.createFolder( (IFolder) file.getParent(), true, monitor );
+        }
+
+        InputStream is = new BufferedInputStream( new FileInputStream( new File( sourceDir, relPath ) ) );
+        try
+        {
+            if ( file.exists() )
+            {
+                file.setContents( is, true, false, monitor );
+            }
+            else
+            {
+                file.create( is, true, monitor );
+                file.setDerived( true, monitor );
+            }
+        }
+        finally
+        {
+            IOUtil.close( is );
+        }
+
+        return file;
     }
 
     protected MojoExecution amendExecution( MojoExecution original, IMavenProjectFacade facade )
