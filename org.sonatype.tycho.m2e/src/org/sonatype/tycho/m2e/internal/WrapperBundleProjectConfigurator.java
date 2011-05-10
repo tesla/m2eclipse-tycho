@@ -11,32 +11,26 @@ import static org.sonatype.tycho.m2e.internal.AbstractMavenBundlePluginProjectCo
 import static org.sonatype.tycho.m2e.internal.AbstractMavenBundlePluginProjectConfigurator.MOJO_GROUP_ID;
 import static org.sonatype.tycho.m2e.internal.AbstractMavenBundlePluginProjectConfigurator.isOsgiBundleProject;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.jar.Attributes;
+import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.zip.ZipEntry;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
@@ -106,65 +100,84 @@ public class WrapperBundleProjectConfigurator
             throw new IllegalArgumentException();
         }
 
-        File outputDirectory = getOutputDirectory( facade.getMavenProject() );
-
-        // clean old junk
-        // @TODO clean old linked resources
-        IPath outputPath = MavenProjectUtils.getProjectRelativePath( project, outputDirectory.getAbsolutePath() );
-        if ( outputPath != null )
-        {
-            IFolder folder = project.getFolder( outputPath );
-            folder.delete( true, monitor );
-        }
+        // @TODO clean old copied resources
 
         // execute maven-bundle-plugin:bundle goal
-        MojoExecution execution = amendExecution( executions.get( 0 ), facade );
-        maven.execute( request.getMavenSession(), execution, monitor );
+        MojoExecution execution = executions.get( 0 ); // amendExecution( executions.get( 0 ), facade );
+        MavenSession mavenSession = request.getMavenSession();
 
-        // refresh generated resources
-        project.getFolder( "META-INF" ).refreshLocal( IResource.DEPTH_INFINITE, monitor );
-        if ( outputPath != null )
-        {
-            IFolder folder = project.getFolder( outputPath );
-            folder.refreshLocal( IResource.DEPTH_INFINITE, monitor );
-        }
+        maven.execute( mavenSession, execution, monitor );
 
-        // create linked classpath entries
-        try
+        File bundleJar = mavenSession.getCurrentProject().getArtifact().getFile();
+
+        // @TODO refresh bundleJar
+
+        if ( bundleJar != null && bundleJar.canRead() )
         {
-            addClasspathEntries( classpath, facade, monitor );
-        }
-        catch ( CoreException e )
-        {
-            throw e;
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
+            // create linked classpath entries
+            try
+            {
+                JarFile jf = new JarFile( bundleJar );
+
+                try
+                {
+                    copyToWorkspace( jf, project, "META-INF/MANIFEST.MF", monitor );
+
+                    addClasspathEntries( classpath, facade, jf, monitor );
+                }
+                finally
+                {
+                    jf.close();
+                }
+            }
+            catch ( CoreException e )
+            {
+                throw e;
+            }
+            catch ( Exception e )
+            {
+                e.printStackTrace();
+            }
         }
 
     }
 
-    protected void addClasspathEntries( IClasspathDescriptor classpath, IMavenProjectFacade facade,
-                                        IProgressMonitor monitor )
-        throws CoreException, Exception
+    protected IFile copyToWorkspace( JarFile jarFile, IProject project, String relPath, IProgressMonitor monitor )
+        throws CoreException, IOException
     {
-        IProject project = facade.getProject();
-        MavenProject mavenProject = facade.getMavenProject( monitor );
+        ZipEntry ze = jarFile.getEntry( relPath );
 
-        File outputDirectory = getOutputDirectory( mavenProject );
-
-        Manifest mf;
-
-        InputStream is = project.getFile( "META-INF/MANIFEST.MF" ).getContents();
+        InputStream is = jarFile.getInputStream( ze );
         try
         {
-            mf = new Manifest( is );
+            IFile ifile = project.getFile( relPath );
+
+            if ( ifile.exists() )
+            {
+                ifile.setContents( is, true, false, monitor );
+            }
+            else
+            {
+                ifile.create( is, true, monitor );
+                ifile.setDerived( true, monitor );
+            }
+
+            return ifile;
         }
         finally
         {
             IOUtil.close( is );
         }
+    }
+
+    protected void addClasspathEntries( IClasspathDescriptor classpath, IMavenProjectFacade facade, JarFile jf,
+                                        IProgressMonitor monitor )
+        throws CoreException, Exception
+    {
+        IProject project = facade.getProject();
+
+        Manifest mf = jf.getManifest();
+
         Attributes attrs = mf.getMainAttributes();
         String value = attrs.getValue( Constants.BUNDLE_CLASSPATH );
 
@@ -177,7 +190,7 @@ public class WrapperBundleProjectConfigurator
                 // otherwise it does not include our classpath entries to dev.properties file
                 // or Bundle.getEntry does not work for the nested jars, if they are linked workspace resources
 
-                IFile file = createWorkspaceFile( project, outputDirectory, path, monitor );
+                IFile file = copyToWorkspace( jf, project, path, monitor );
 
                 IClasspathEntryDescriptor ed = classpath.addLibraryEntry( file.getFullPath() );
                 ed.setExported( true );
@@ -185,69 +198,11 @@ public class WrapperBundleProjectConfigurator
         }
     }
 
-    protected IFile createWorkspaceFile( IProject targetProject, File sourceDir, String relPath,
-                                         IProgressMonitor monitor )
-        throws CoreException, FileNotFoundException
-    {
-        IFile file = targetProject.getFile( relPath );
-        if ( file.getParent() instanceof IFolder )
-        {
-            M2EUtils.createFolder( (IFolder) file.getParent(), true, monitor );
-        }
+//    @Override
+//    public AbstractBuildParticipant getBuildParticipant( IMavenProjectFacade projectFacade, MojoExecution execution,
+//                                                         IPluginExecutionMetadata executionMetadata )
+//    {
+//        return AbstractMavenBundlePluginProjectConfigurator.getBuildParticipant( execution );
+//    }
 
-        InputStream is = new BufferedInputStream( new FileInputStream( new File( sourceDir, relPath ) ) );
-        try
-        {
-            if ( file.exists() )
-            {
-                file.setContents( is, true, false, monitor );
-            }
-            else
-            {
-                file.create( is, true, monitor );
-                file.setDerived( true, monitor );
-            }
-        }
-        finally
-        {
-            IOUtil.close( is );
-        }
-
-        return file;
-    }
-
-    protected MojoExecution amendExecution( MojoExecution original, IMavenProjectFacade facade )
-    {
-        MojoExecution execution =
-            new MojoExecution( original.getPlugin(), "bundle", "tycho-m2e:" + original.getExecutionId() + ":bundle" );
-
-        Xpp3Dom configuration = new Xpp3Dom( original.getConfiguration() );
-
-        Xpp3Dom unpackBundle = configuration.getChild( "unpackBundle" );
-        if ( unpackBundle == null )
-        {
-            unpackBundle = new Xpp3Dom( "unpackBundle" );
-            configuration.addChild( unpackBundle );
-        }
-        unpackBundle.setValue( "true" );
-
-        Xpp3Dom outputDirectory = configuration.getChild( "outputDirectory" );
-        if ( outputDirectory == null )
-        {
-            outputDirectory = new Xpp3Dom( "outputDirectory" );
-            configuration.addChild( outputDirectory );
-        }
-        outputDirectory.setValue( getOutputDirectory( facade.getMavenProject() ).getAbsolutePath() );
-
-        execution.setConfiguration( configuration );
-        execution.setMojoDescriptor( original.getMojoDescriptor() );
-        execution.setLifecyclePhase( original.getLifecyclePhase() );
-
-        return execution;
-    }
-
-    public static File getOutputDirectory( MavenProject project )
-    {
-        return new File( project.getBuild().getDirectory(), "m2e-tycho" ).getAbsoluteFile();
-    }
 }
