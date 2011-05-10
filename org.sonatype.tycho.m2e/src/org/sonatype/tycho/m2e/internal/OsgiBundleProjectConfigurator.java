@@ -30,7 +30,9 @@ public class OsgiBundleProjectConfigurator
             throw new IllegalArgumentException();
         }
         IProject project = request.getProject();
-        PDEProjectHelper.addPDENature( project, monitor );
+        IMavenProjectFacade facade = request.getMavenProjectFacade();
+
+        PDEProjectHelper.addPDENature( project, getManifestPath( facade, request.getMavenSession(), monitor ), monitor );
     }
 
     @Override
@@ -39,4 +41,5 @@ public class OsgiBundleProjectConfigurator
     {
         return getBuildParticipant( execution );
     }
+
 }

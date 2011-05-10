@@ -7,17 +7,22 @@
  *******************************************************************************/
 package org.sonatype.tycho.m2e.internal;
 
+import java.io.File;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -94,11 +99,38 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
                 throws Exception
             {
                 Set<IProject> projects = super.build( kind, monitor );
-                IFile file = getMavenProjectFacade().getProject().getFile( "META-INF/MANIFEST.MF" );
-                file.refreshLocal( IResource.DEPTH_ZERO, monitor );
+                IProject project = getMavenProjectFacade().getProject();
+
+                IContainer metainf = PDEProjectHelper.getManifestLocation( project );
+                if ( metainf == null || metainf instanceof IProject )
+                {
+                    metainf = project.getFolder( "META-INF" );
+                }
+                metainf.refreshLocal( IResource.DEPTH_INFINITE, monitor );
+
                 return projects;
             }
         };
+    }
+
+    /**
+     * Returns project relative path of generated OSGi bundle manifest
+     */
+    static IPath getManifestPath( IMavenProjectFacade facade, MavenSession session, IProgressMonitor monitor )
+        throws CoreException
+    {
+        IMaven maven = MavenPlugin.getMaven();
+        for ( MojoExecution execution : facade.getMojoExecutions( MOJO_GROUP_ID, MOJO_ARTIFACT_ID, monitor, "manifest",
+                                                                  "bundle" ) )
+        {
+            File location = maven.getMojoParameterValue( session, execution, "manifestLocation", File.class );
+            if ( location != null )
+            {
+                return facade.getProjectRelativePath( location.getAbsolutePath() );
+            }
+        }
+
+        return null;
     }
 
 }

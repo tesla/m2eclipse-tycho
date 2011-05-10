@@ -34,10 +34,10 @@ public class MavenBundlePluginTest
         throws Exception
     {
         IMavenProjectFacade facade = importMavenProject( "projects/maven-bundle-plugin/bundle", "pom.xml" );
-        assertPDEPluginProject( facade );
+        assertPDEPluginProject( facade, "META-INF/MANIFEST.MF" );
     }
 
-    private void assertPDEPluginProject( IMavenProjectFacade facade )
+    private void assertPDEPluginProject( IMavenProjectFacade facade, String manifestRelPath )
         throws CoreException, JavaModelException, InterruptedException
     {
         assertNotNull( "Expected not null maven project facade", facade );
@@ -59,7 +59,7 @@ public class MavenBundlePluginTest
         // make sure manifest is generated properly
         project.build( IncrementalProjectBuilder.FULL_BUILD, monitor );
         waitForJobsToComplete();
-        assertTrue( project.getFile( "META-INF/MANIFEST.MF" ).isAccessible() );
+        assertTrue( project.getFile( manifestRelPath ).isAccessible() );
 
         // make sure PDE builder is not enabled
         ICommand[] builders = project.getDescription().getBuildSpec();
@@ -89,11 +89,23 @@ public class MavenBundlePluginTest
         throws Exception
     {
         IMavenProjectFacade facade = importMavenProject( "projects/maven-bundle-plugin/bundle-packaging", "pom.xml" );
-        assertPDEPluginProject( facade );
+        assertPDEPluginProject( facade, "META-INF/MANIFEST.MF" );
 
         // make sure full bundle is not packaged during workspace build
         IFile bundle = facade.getProject().getFile( "target/bundle-packaging-0.0.1-SNAPSHOT.jar" );
         bundle.refreshLocal( IResource.DEPTH_ZERO, monitor );
         assertFalse( bundle.exists() );
+    }
+
+    public void testDefaultManifestLocation()
+        throws Exception
+    {
+        IMavenProjectFacade facade = importMavenProject( "projects/maven-bundle-plugin/manifestlocation", "pom.xml" );
+        assertPDEPluginProject( facade, "target/classes/META-INF/MANIFEST.MF" );
+
+        // make sure no META-INF/MANIFEST.MF 
+        IFile manifest = facade.getProject().getFile( "META-INF/MANIFEST.MF" );
+        manifest.getParent().refreshLocal( IResource.DEPTH_INFINITE, monitor );
+        assertFalse( manifest.exists() );
     }
 }

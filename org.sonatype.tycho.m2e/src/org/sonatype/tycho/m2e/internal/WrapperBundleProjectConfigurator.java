@@ -9,6 +9,7 @@ package org.sonatype.tycho.m2e.internal;
 
 import static org.sonatype.tycho.m2e.internal.AbstractMavenBundlePluginProjectConfigurator.MOJO_ARTIFACT_ID;
 import static org.sonatype.tycho.m2e.internal.AbstractMavenBundlePluginProjectConfigurator.MOJO_GROUP_ID;
+import static org.sonatype.tycho.m2e.internal.AbstractMavenBundlePluginProjectConfigurator.getManifestPath;
 import static org.sonatype.tycho.m2e.internal.AbstractMavenBundlePluginProjectConfigurator.isOsgiBundleProject;
 
 import java.io.File;
@@ -23,14 +24,19 @@ import java.util.zip.ZipEntry;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.codehaus.plexus.util.IOUtil;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.m2e.core.internal.M2EUtils;
+import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
@@ -73,12 +79,15 @@ public class WrapperBundleProjectConfigurator
     }
 
     @Override
-    protected void addJavaNature( IProject project, IProgressMonitor monitor )
+    public void configure( ProjectConfigurationRequest request, IProgressMonitor monitor )
         throws CoreException
     {
-        super.addJavaNature( project, monitor );
+        super.configure( request, monitor );
 
-        PDEProjectHelper.addPDENature( project, monitor );
+        IProject project = request.getProject();
+        MavenSession session = request.getMavenSession();
+        IMavenProjectFacade facade = request.getMavenProjectFacade();
+        PDEProjectHelper.addPDENature( project, getManifestPath(facade, session, monitor), monitor );
     }
 
     public void addBundleClasspathEntries( IClasspathDescriptor classpath, ProjectConfigurationRequest request,
@@ -86,7 +95,6 @@ public class WrapperBundleProjectConfigurator
         throws CoreException
     {
         IMavenProjectFacade facade = request.getMavenProjectFacade();
-        IProject project = facade.getProject();
 
         if ( !isOsgiBundleProject( facade, monitor ) )
         {
@@ -121,8 +129,6 @@ public class WrapperBundleProjectConfigurator
 
                 try
                 {
-                    copyToWorkspace( jf, project, "META-INF/MANIFEST.MF", monitor );
-
                     addClasspathEntries( classpath, facade, jf, monitor );
                 }
                 finally
@@ -151,6 +157,12 @@ public class WrapperBundleProjectConfigurator
         try
         {
             IFile ifile = project.getFile( relPath );
+            
+            IContainer parent = ifile.getParent();
+            if ( parent instanceof IFolder )
+            {
+                M2EUtils.createFolder( (IFolder) parent, false, monitor );
+            }
 
             if ( ifile.exists() )
             {
@@ -198,11 +210,11 @@ public class WrapperBundleProjectConfigurator
         }
     }
 
-//    @Override
-//    public AbstractBuildParticipant getBuildParticipant( IMavenProjectFacade projectFacade, MojoExecution execution,
-//                                                         IPluginExecutionMetadata executionMetadata )
-//    {
-//        return AbstractMavenBundlePluginProjectConfigurator.getBuildParticipant( execution );
-//    }
+    @Override
+    public AbstractBuildParticipant getBuildParticipant( IMavenProjectFacade projectFacade, MojoExecution execution,
+                                                         IPluginExecutionMetadata executionMetadata )
+    {
+        return AbstractMavenBundlePluginProjectConfigurator.getBuildParticipant( execution );
+    }
 
 }

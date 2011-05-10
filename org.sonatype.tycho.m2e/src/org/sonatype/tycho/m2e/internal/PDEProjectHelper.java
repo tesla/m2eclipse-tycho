@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -31,11 +32,13 @@ import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
+import org.eclipse.pde.core.project.IBundleProjectService;
 import org.eclipse.pde.internal.core.ClasspathComputer;
 import org.eclipse.pde.internal.core.IPluginModelListener;
 import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.pde.internal.core.PluginModelDelta;
 import org.eclipse.pde.internal.core.natures.PDE;
+import org.eclipse.pde.internal.core.project.PDEProject;
 import org.eclipse.pde.internal.core.util.CoreUtility;
 
 @SuppressWarnings( "restriction" )
@@ -170,7 +173,7 @@ public class PDEProjectHelper
         return folder.getFullPath();
     }
 
-    public static void addPDENature( IProject project, IProgressMonitor monitor )
+    public static void addPDENature( IProject project, IPath manifestPath, IProgressMonitor monitor )
         throws CoreException
     {
         AbstractProjectConfigurator.addNature( project, PDE.PLUGIN_NATURE, monitor );
@@ -186,6 +189,24 @@ public class PDEProjectHelper
         }
         description.setBuildSpec( newBuilders.toArray( new ICommand[newBuilders.size()] ) );
         project.setDescription( description, monitor );
+
+        IBundleProjectService projectService = Activator.getDefault().getProjectService();
+        if ( manifestPath != null && manifestPath.segmentCount() > 1 )
+        {
+            IPath metainfPath = manifestPath.removeLastSegments( 1 );
+            project.getFile( metainfPath ).refreshLocal( IResource.DEPTH_INFINITE, monitor );
+            projectService.setBundleRoot( project, metainfPath );
+        }
+        else
+        {
+            // in case of configuration update, reset to the default value
+            projectService.setBundleRoot( project, null );
+        }
     }
 
+    public static IContainer getManifestLocation( IProject project )
+    {
+        // PDE API is very inconvenient, lets use internal classes instead
+        return PDEProject.getBundleRoot( project );
+    }
 }
