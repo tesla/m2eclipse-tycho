@@ -7,11 +7,17 @@
  *******************************************************************************/
 package org.sonatype.tycho.m2e.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractCustomizableLifecycleMapping;
+import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.pde.internal.core.natures.PDE;
@@ -57,4 +63,24 @@ public abstract class AbstractTychoLifecycleMapping
         }
     }
 
+    @Override
+    public List<AbstractProjectConfigurator> getProjectConfigurators( IMavenProjectFacade projectFacade,
+                                                                      IProgressMonitor monitor )
+    {
+        List<AbstractProjectConfigurator> configurators =
+            new ArrayList<AbstractProjectConfigurator>( super.getProjectConfigurators( projectFacade, monitor ) );
+
+        // workaround for tycho projects that have maven-bundle-plugin enabled for them
+        ListIterator<AbstractProjectConfigurator> li = configurators.listIterator();
+        while ( li.hasNext() )
+        {
+            AbstractProjectConfigurator configurator = li.next();
+            if ( configurator instanceof OsgiBundleProjectConfigurator )
+            {
+                li.remove();
+            }
+        }
+
+        return configurators;
+    }
 }
