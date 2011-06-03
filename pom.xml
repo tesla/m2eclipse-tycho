@@ -26,8 +26,8 @@
   <packaging>pom</packaging>
 
   <properties>
-    <m2e.version>0.13.0/N/0.13.0.201105051306</m2e.version>
-    <m2e-extras.version>0.13.0/N/0.13.0.201104051625</m2e-extras.version>
+    <m2e.version>1.0.0/N/LATEST</m2e.version>
+    <m2e-extras.version>0.13.0/N/0.13.0.201106022023</m2e-extras.version>
     <orbit.version>S20110304120314</orbit.version>
 
     <tycho-version>0.10.0</tycho-version>
