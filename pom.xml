@@ -26,11 +26,9 @@
   <packaging>pom</packaging>
 
   <properties>
-    <m2e.version>1.0.0/N/LATEST</m2e.version>
-    <m2e-extras.version>0.13.0/N/0.13.0.201106022023</m2e-extras.version>
-    <orbit.version>S20110304120314</orbit.version>
+    <m2e-extras.version>0.13.0/N/0.13.0.201106171509</m2e-extras.version>
 
-    <tycho-version>0.10.0</tycho-version>
+    <tycho-version>0.11.1</tycho-version>
 
     <m2e.site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</m2e.site-compressed>
   </properties>
@@ -48,17 +46,12 @@
     <repository>
       <id>helios</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/helios</url>
-    </repository>
-    <repository>
-      <id>orbit</id>
-      <layout>p2</layout>
-      <url>http://download.eclipse.org/tools/orbit/downloads/drops/${orbit.version}/repository</url>
+      <url>http://download.eclipse.org/releases/indigo</url>
     </repository>
     <repository>
       <id>m2e</id>
       <layout>p2</layout>
-      <url>http://repository.sonatype.org/content/sites/forge-sites/m2e/${m2e.version}</url>
+      <url>http://download.eclipse.org/technology/m2e/releases/1.0</url>
     </repository>
     <repository>
       <id>m2e-extras</id>
@@ -134,9 +127,28 @@
         </property>
       </activation>
       <properties>
-        <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m -Dosgi.ws=cocoa -XstartOnFirstThread</tycho.test.jvmArgs>
-        <osgi.ws>cocoa</osgi.ws>
+        <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m -XstartOnFirstThread</tycho.test.jvmArgs>
       </properties>      
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.sonatype.tycho</groupId>
+              <artifactId>maven-osgi-test-plugin</artifactId>
+              <version>${tycho-version}</version>
+              <configuration>
+                <dependencies>
+                  <dependency>
+                    <artifactId>org.eclipse.jdt.launching.macosx</artifactId>
+                    <version>3.2.100</version>
+                    <type>eclipse-plugin</type>
+                  </dependency>
+                </dependencies>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
     </profile>
 
     <profile>
