@@ -10,11 +10,17 @@ package org.sonatype.tycho.m2e.internal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.m2e.core.internal.project.registry.AbstractMavenDependencyResolver;
+import org.eclipse.m2e.core.internal.project.registry.Capability;
+import org.eclipse.m2e.core.internal.project.registry.ILifecycleMapping2;
+import org.eclipse.m2e.core.internal.project.registry.RequiredCapability;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractCustomizableLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -26,10 +32,22 @@ import org.eclipse.pde.internal.core.util.CoreUtility;
 @SuppressWarnings( "restriction" )
 public abstract class AbstractTychoLifecycleMapping
     extends AbstractCustomizableLifecycleMapping
-    implements ILifecycleMapping
+    implements ILifecycleMapping, ILifecycleMapping2
 {
 
     private PDEProjectHelper pdeHelper = PDEProjectHelper.getInstance();
+
+    private static final AbstractMavenDependencyResolver NOOP_DEPENDENCY_RESOLVER =
+        new AbstractMavenDependencyResolver()
+        {
+            @Override
+            public void resolveProjectDependencies( IMavenProjectFacade facade, MavenExecutionRequest mavenRequest,
+                                                    Set<Capability> capabilities, Set<RequiredCapability> requirements,
+                                                    IProgressMonitor monitor )
+                throws CoreException
+            {
+            }
+        };
 
     @Override
     public void configure( ProjectConfigurationRequest request, IProgressMonitor monitor )
@@ -82,5 +100,10 @@ public abstract class AbstractTychoLifecycleMapping
         }
 
         return configurators;
+    }
+
+    public AbstractMavenDependencyResolver getDependencyResolver( IProgressMonitor monitor )
+    {
+        return NOOP_DEPENDENCY_RESOLVER;
     }
 }
