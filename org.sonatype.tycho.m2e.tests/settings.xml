@@ -40,17 +40,6 @@
           </pluginRepository>
         </pluginRepositories>
     </profile>
-    <profile>
-      <id>staged-tycho-0.12</id>
-        <pluginRepositories>
-          <pluginRepository>
-            <id>tycho-0.12</id>
-            <url>https://repository.sonatype.org/content/repositories/tycho-014/ </url>
-            <snapshots><enabled>false</enabled></snapshots>
-            <releases><enabled>true</enabled></releases>
-          </pluginRepository>
-        </pluginRepositories>
-    </profile>
   </profiles>
 
   <activeProfiles>
