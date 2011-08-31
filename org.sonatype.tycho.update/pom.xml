@@ -15,8 +15,9 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.tycho</groupId>
-        <artifactId>maven-osgi-packaging-plugin</artifactId>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-packaging-plugin</artifactId>
+	<version>${tycho-version}</version>
         <executions>
           <execution>
             <id>build-qualifier</id>
@@ -29,8 +30,9 @@
       </plugin>
 
       <plugin>
-        <groupId>org.sonatype.tycho</groupId>
-        <artifactId>maven-osgi-packaging-plugin</artifactId>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-packaging-plugin</artifactId>
+        <version>${tycho-version}</version>
         <configuration>
           <metadataRepositoryName>Tycho Project Configurators Update
             Site</metadataRepositoryName>
