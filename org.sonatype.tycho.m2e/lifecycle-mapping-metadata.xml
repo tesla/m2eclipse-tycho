@@ -106,6 +106,7 @@
         <goals>
           <goal>build-qualifier</goal>
           <goal>validate-version</goal>
+          <goal>validate-id</goal>
         </goals>
       </pluginExecutionFilter>
       <action>
