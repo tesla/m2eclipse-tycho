@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.sonatype.tycho.m2e</groupId>
     <artifactId>m2eclipse-tycho</artifactId>
-    <version>0.5.0-SNAPSHOT</version>
+    <version>0.6.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.sonatype.tycho.update</artifactId>
@@ -17,7 +17,7 @@
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-packaging-plugin</artifactId>
-	<version>${tycho-version}</version>
+        <version>${tycho-version}</version>
         <executions>
           <execution>
             <id>build-qualifier</id>
@@ -27,17 +27,9 @@
             <phase>validate</phase>
           </execution>
         </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-packaging-plugin</artifactId>
-        <version>${tycho-version}</version>
         <configuration>
-          <metadataRepositoryName>Tycho Project Configurators Update
-            Site</metadataRepositoryName>
-          <artifactRepositoryName>Tycho Project Configurators Update
-            Site Artifacts</artifactRepositoryName>
+          <metadataRepositoryName>Tycho Project Configurators Update Site</metadataRepositoryName>
+          <artifactRepositoryName>Tycho Project Configurators Update Site Artifacts</artifactRepositoryName>
         </configuration>
       </plugin>
 

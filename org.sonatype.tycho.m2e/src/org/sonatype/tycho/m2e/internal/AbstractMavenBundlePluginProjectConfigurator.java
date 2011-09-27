@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 Sonatype, Inc.
+ * Copyright (c) 2008-2011 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,18 +15,23 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.eclipse.core.resources.IContainer;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.Scanner;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 public abstract class AbstractMavenBundlePluginProjectConfigurator
     extends AbstractProjectConfigurator
@@ -34,6 +39,9 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
     public static final String MOJO_GROUP_ID = "org.apache.felix";
 
     public static final String MOJO_ARTIFACT_ID = "maven-bundle-plugin";
+
+    protected static final QualifiedName PROP_FORCE_GENERATE = new QualifiedName( Activator.PLUGIN_ID,
+                                                                                       "forceGenerate" );
 
     static boolean isOsgiBundleProject( IMavenProjectFacade facade, IProgressMonitor monitor )
         throws CoreException
@@ -69,6 +77,53 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
 
     static AbstractBuildParticipant getBuildParticipant( MojoExecution execution )
     {
+        execution = amendMojoExecution( execution );
+
+        return new MojoExecutionBuildParticipant( execution, true )
+        {
+            @Override
+            public Set<IProject> build( int kind, IProgressMonitor monitor )
+                throws Exception
+            {
+                BuildContext buildContext = getBuildContext();
+                IMavenProjectFacade facade = getMavenProjectFacade();
+                MavenProject mavenProject = facade.getMavenProject( monitor );
+
+                IProject project = facade.getProject();
+                IFile manifest =
+                    project.getFolder( getMetainfPath( facade, getSession(), monitor ) ).getFile( "MANIFEST.MF" );
+
+                // the property is set by OsgiBundleProjectConfigurator.mavenProjectChanged is a workaround for
+                // m2e design limitation, which does not allow project configurators trigger resource deltas
+                // visible to build participants. See comment in OsgiBundleProjectConfigurator.mavenProjectChanged 
+                boolean force = Boolean.parseBoolean( (String) project.getSessionProperty( PROP_FORCE_GENERATE ) );
+                project.setSessionProperty( PROP_FORCE_GENERATE, null );
+
+                // to handle dependency changes, regenerate bundle manifest even if no interesting changes
+                IResourceDelta delta = getDelta( project );
+                if ( !force && manifest.isAccessible() && delta != null
+                    && delta.findMember( manifest.getProjectRelativePath() ) == null )
+                {
+                    Scanner ds = buildContext.newScanner( new File( mavenProject.getBuild().getOutputDirectory() ) );
+                    ds.scan();
+                    String[] includedFiles = ds.getIncludedFiles();
+                    if ( includedFiles == null || includedFiles.length <= 0 )
+                    {
+                        return null;
+                    }
+                }
+
+                Set<IProject> projects = super.build( kind, monitor );
+                manifest.refreshLocal( IResource.DEPTH_INFINITE, monitor ); // refresh parent?
+
+                return projects;
+            }
+
+        };
+    }
+
+    protected static MojoExecution amendMojoExecution( MojoExecution execution )
+    {
         if ( !isMavenBundlePluginMojo( execution ) )
         {
             throw new IllegalArgumentException();
@@ -84,39 +139,20 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
             descriptor.setGoal( "manifest" );
             descriptor.setImplementation( "org.apache.felix.bundleplugin.ManifestPlugin" );
             MojoExecution _execution =
-                new MojoExecution( execution.getPlugin(), "manifest", "tycho-m2e:" + execution.getExecutionId()
+                new MojoExecution( execution.getPlugin(), "manifest", "m2e-tycho:" + execution.getExecutionId()
                     + ":manifest" );
             _execution.setConfiguration( execution.getConfiguration() );
             _execution.setMojoDescriptor( descriptor );
             _execution.setLifecyclePhase( execution.getLifecyclePhase() );
             execution = _execution;
         }
-
-        return new MojoExecutionBuildParticipant( execution, false )
-        {
-            @Override
-            public Set<IProject> build( int kind, IProgressMonitor monitor )
-                throws Exception
-            {
-                Set<IProject> projects = super.build( kind, monitor );
-                IProject project = getMavenProjectFacade().getProject();
-
-                IContainer metainf = PDEProjectHelper.getManifestLocation( project );
-                if ( metainf == null || metainf instanceof IProject )
-                {
-                    metainf = project.getFolder( "META-INF" );
-                }
-                metainf.refreshLocal( IResource.DEPTH_INFINITE, monitor );
-
-                return projects;
-            }
-        };
+        return execution;
     }
 
     /**
-     * Returns project relative path of generated OSGi bundle manifest
+     * Returns project relative path of the <b>folder</b> where the generated manifest is or will be written
      */
-    static IPath getManifestPath( IMavenProjectFacade facade, MavenSession session, IProgressMonitor monitor )
+    static IPath getMetainfPath( IMavenProjectFacade facade, MavenSession session, IProgressMonitor monitor )
         throws CoreException
     {
         IMaven maven = MavenPlugin.getMaven();

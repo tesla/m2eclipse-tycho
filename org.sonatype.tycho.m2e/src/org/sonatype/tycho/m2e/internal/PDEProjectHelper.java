@@ -15,6 +15,7 @@ import java.util.List;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -24,6 +25,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -64,13 +66,13 @@ public class PDEProjectHelper
     {
         public void modelsChanged( PluginModelDelta delta )
         {
-            if ( projectsForUpdateClasspath.size() == 0 )
-            {
-                return;
-            }
-
             synchronized ( projectsForUpdateClasspath )
             {
+                if ( projectsForUpdateClasspath.size() == 0 )
+                {
+                    return;
+                }
+
                 Iterator<IProject> projectsIter = projectsForUpdateClasspath.iterator();
                 while ( projectsIter.hasNext() )
                 {
@@ -107,7 +109,7 @@ public class PDEProjectHelper
         public IStatus runInWorkspace( IProgressMonitor monitor )
             throws CoreException
         {
-            ClasspathComputer.setClasspath( project, model );
+            setClasspath( project, model, monitor );
             return Status.OK_STATUS;
         }
     }
@@ -140,7 +142,7 @@ public class PDEProjectHelper
         IPluginModelBase model = PluginRegistry.findModel( project );
         if ( model != null )
         {
-            ClasspathComputer.setClasspath( project, model );
+            setClasspath( project, model, monitor );
         }
         else
         {
@@ -190,6 +192,12 @@ public class PDEProjectHelper
         description.setBuildSpec( newBuilders.toArray( new ICommand[newBuilders.size()] ) );
         project.setDescription( description, monitor );
 
+        setManifestLocaton( project, manifestPath, monitor );
+    }
+
+    protected static void setManifestLocaton( IProject project, IPath manifestPath, IProgressMonitor monitor )
+        throws CoreException
+    {
         IBundleProjectService projectService = Activator.getDefault().getProjectService();
         if ( manifestPath != null && manifestPath.segmentCount() > 1 )
         {
@@ -204,9 +212,49 @@ public class PDEProjectHelper
         }
     }
 
-    public static IContainer getManifestLocation( IProject project )
+    /**
+     * Returns bundle manifest as known to PDE project metadata. Returned file may not exist in the workspace or on the
+     * filesystem. Never returns null.
+     */
+    public static IFile getBundleManifest( IProject project )
+        throws CoreException
     {
         // PDE API is very inconvenient, lets use internal classes instead
-        return PDEProject.getBundleRoot( project );
+        IContainer metainf = PDEProject.getBundleRoot( project );
+        if ( metainf == null || metainf instanceof IProject )
+        {
+            metainf = project.getFolder( "META-INF" );
+        }
+        else
+        {
+            metainf = metainf.getFolder( new Path( "META-INF" ) );
+        }
+
+        return metainf.getFile( new Path( "MANIFEST.MF" ) );
+    }
+
+    private static void setClasspath( IProject project, IPluginModelBase model, IProgressMonitor monitor )
+        throws CoreException
+    {
+        ClasspathComputer.setClasspath( project, model );
+
+        // workaround PDE sloppy model management during the first multimodule project import in eclipse session
+        // 1. m2e creates all modules as simple workspace projects without JDT or PDE nattues
+        // 2. first call to org.eclipse.pde.internal.core.PluginModelManager.initializeTable() reads all workspace
+        // projects regardless of their natures (see https://bugs.eclipse.org/bugs/show_bug.cgi?id=319268)
+        // 3. going through all projects one by one
+        // 3.1. m2e enables JDE and PDE natures and adds PDE classpath container
+        // 3.2. org.eclipse.pde.internal.core.PDEClasspathContainer.addProjectEntry ignores all project's dependencies
+        // that do not have JAVA nature. at this point PDE classpath is missing some/all workspace dependencies.
+        // 4. PDE does not re-resolve classpath when dependencies get JAVA nature enabled
+
+        // as a workaround, touch project bundle manifests to force PDE re-read the model, reresolve dependencies
+        // and recalculate PDE classpath
+
+        IFile manifest = PDEProjectHelper.getBundleManifest( project );
+        if ( manifest.isAccessible() )
+        {
+            manifest.touch( monitor );
+        }
     }
 }

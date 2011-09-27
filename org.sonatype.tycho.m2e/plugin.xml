@@ -16,11 +16,6 @@
       id="org.sonatype.tycho.m2e.tychoLifecycleMapping"
       name="Tycho Build Lifecycle Mapping">
     </lifecycleMapping>
-    <lifecycleMapping
-          class="org.sonatype.tycho.m2e.internal.WrapperBundleLifecycleMapping"
-          id="org.sonatype.tycho.m2e.wrapperBundle"
-          name="Wrapper Bundle Lifecycle Mapping">
-    </lifecycleMapping>
   </extension>
   <extension
     point="org.eclipse.m2e.core.projectConfigurators">
@@ -29,13 +24,15 @@
       id="maven-bundle-plugin"
       name="Project Configurator for maven-bundle-plugin osgi-bundle projects">
     </configurator>
-    <configurator
-          class="org.sonatype.tycho.m2e.internal.WrapperBundleProjectConfigurator"
-          id="org.sonatype.tycho.m2e.wrapperBundle"
-          name="Wrapper Bundle Project Configurator">
-    </configurator>
   </extension>
   <extension
         point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
+  </extension>
+  <extension
+        point="org.eclipse.pde.core.bundleClasspathResolvers">
+     <resolver
+           class="org.sonatype.tycho.m2e.internal.launching.PDEBundleClasspathResolver"
+           nature="org.eclipse.m2e.core.maven2Nature">
+     </resolver>
   </extension>
 </plugin>

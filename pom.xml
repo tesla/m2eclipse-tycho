@@ -22,13 +22,13 @@
 
   <groupId>org.sonatype.tycho.m2e</groupId>
   <artifactId>m2eclipse-tycho</artifactId>
-  <version>0.5.0-SNAPSHOT</version>
+  <version>0.6.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <properties>
     <m2e-extras.version>0.13.0/N/0.13.0.201106171509</m2e-extras.version>
 
-    <tycho-version>0.12.0</tycho-version>
+    <tycho-version>0.13.0</tycho-version>
 
     <m2e.site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</m2e.site-compressed>
   </properties>
@@ -43,9 +43,9 @@
 
   <repositories>
     <repository>
-      <id>helios</id>
+      <id>eclipse</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/indigo</url>
+      <url>http://download.eclipse.org/releases/staging/</url>
     </repository>
     <repository>
       <id>m2e</id>
@@ -140,6 +140,11 @@
                   <dependency>
                     <artifactId>org.eclipse.jdt.launching.macosx</artifactId>
                     <version>3.2.100</version>
+                    <type>eclipse-plugin</type>
+                  </dependency>
+                  <dependency>
+                    <artifactId>org.eclipse.ui.workbench</artifactId>
+                    <version>3.102.0</version>
                     <type>eclipse-plugin</type>
                   </dependency>
                 </dependencies>
