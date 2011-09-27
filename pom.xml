@@ -147,6 +147,16 @@
                     <version>3.102.0</version>
                     <type>eclipse-plugin</type>
                   </dependency>
+                  <dependency>
+                    <artifactId>org.eclipse.equinox.event</artifactId>
+                    <version>0.0.0</version>
+                    <type>eclipse-plugin</type>
+                  </dependency>
+                  <dependency>
+                    <artifactId>org.eclipse.e4.ui.workbench.addons.swt</artifactId>
+                    <version>0.0.0</version>
+                    <type>eclipse-plugin</type>
+                  </dependency>
                 </dependencies>
               </configuration>
             </plugin>
