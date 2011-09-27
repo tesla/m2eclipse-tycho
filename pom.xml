@@ -7,7 +7,7 @@
   http://www.eclipse.org/legal/epl-v10.html
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <prerequisites>
@@ -91,16 +91,41 @@
         </configuration>
       </plugin>
     </plugins>
-	<pluginManagement>
-	  <plugins>
+    <pluginManagement>
+      <plugins>
         <!-- important for self-hosting -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <version>2.5</version>
         </plugin>
-	  </plugins>
-	</pluginManagement>
+
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-surefire-plugin</artifactId>
+          <version>${tycho-version}</version>
+          <configuration>
+            <dependencies>
+              <dependency>
+                <artifactId>org.eclipse.ui.workbench</artifactId>
+                <version>3.102.0</version>
+                <type>eclipse-plugin</type>
+              </dependency>
+              <dependency>
+                <artifactId>org.eclipse.equinox.event</artifactId>
+                <version>0.0.0</version>
+                <type>eclipse-plugin</type>
+              </dependency>
+              <dependency>
+                <artifactId>org.eclipse.e4.ui.workbench.addons.swt</artifactId>
+                <version>0.0.0</version>
+                <type>eclipse-plugin</type>
+              </dependency>
+            </dependencies>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
   <profiles>
@@ -127,7 +152,7 @@
       </activation>
       <properties>
         <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m -XstartOnFirstThread</tycho.test.jvmArgs>
-      </properties>      
+      </properties>
       <build>
         <pluginManagement>
           <plugins>
@@ -136,25 +161,10 @@
               <artifactId>tycho-surefire-plugin</artifactId>
               <version>${tycho-version}</version>
               <configuration>
-                <dependencies>
+                <dependencies combine.children="append">
                   <dependency>
                     <artifactId>org.eclipse.jdt.launching.macosx</artifactId>
                     <version>3.2.100</version>
-                    <type>eclipse-plugin</type>
-                  </dependency>
-                  <dependency>
-                    <artifactId>org.eclipse.ui.workbench</artifactId>
-                    <version>3.102.0</version>
-                    <type>eclipse-plugin</type>
-                  </dependency>
-                  <dependency>
-                    <artifactId>org.eclipse.equinox.event</artifactId>
-                    <version>0.0.0</version>
-                    <type>eclipse-plugin</type>
-                  </dependency>
-                  <dependency>
-                    <artifactId>org.eclipse.e4.ui.workbench.addons.swt</artifactId>
-                    <version>0.0.0</version>
                     <type>eclipse-plugin</type>
                   </dependency>
                 </dependencies>
@@ -168,7 +178,9 @@
     <profile>
       <id>sign</id>
       <activation>
-        <property><name>jarsigner.alias</name></property>
+        <property>
+          <name>jarsigner.alias</name>
+        </property>
       </activation>
       <build>
         <plugins>
@@ -189,5 +201,5 @@
       </build>
     </profile>
   </profiles>
-  
+
 </project>
