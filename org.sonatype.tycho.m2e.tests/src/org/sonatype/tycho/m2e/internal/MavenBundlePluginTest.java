@@ -8,6 +8,11 @@
 
 package org.sonatype.tycho.m2e.internal;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.jar.Manifest;
+
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -134,5 +139,58 @@ public class MavenBundlePluginTest
 
         assertNoErrors( maven.getProject() );
         assertNoErrors( project );
+    }
+
+    public void testManifestGenerationAfterPomChange()
+        throws Exception
+    {
+        IMavenProjectFacade facade = importMavenProject( "projects/maven-bundle-plugin/pom-change", "pom.xml" );
+
+        IProject project = facade.getProject();
+        IFile mfile = project.getFile( "META-INF/MANIFEST.MF" );
+
+        assertPDEPluginProject( facade, "META-INF/MANIFEST.MF" );
+        assertNoErrors( project );
+        Manifest mf = loadManifest( mfile );
+        assertEquals( "maven-bundle-plugin.pom-change", mf.getMainAttributes().getValue( "Bundle-SymbolicName" ) );
+
+        copyContent( project, new File( "projects/maven-bundle-plugin/pom-change/pom.xml-changed-symbolic-name" ),
+                     "pom.xml" );
+        workspace.build( IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor );
+        waitForJobsToComplete();
+        assertNoErrors( project );
+
+        mf = loadManifest( mfile );
+        assertEquals( "pom-change;singleton:=true", mf.getMainAttributes().getValue( "Bundle-SymbolicName" ) );
+    }
+
+    public void testRequestConfigurationUpdateAfterManifestLocationChange()
+        throws Exception
+    {
+        IMavenProjectFacade facade = importMavenProject( "projects/maven-bundle-plugin/pom-change", "pom.xml" );
+        IProject project = facade.getProject();
+
+        assertPDEPluginProject( facade, "META-INF/MANIFEST.MF" );
+        assertNoErrors( project );
+
+        copyContent( project, new File( "projects/maven-bundle-plugin/pom-change/pom.xml-changed-manifest-location" ),
+                     "pom.xml" );
+        WorkspaceHelpers.assertErrorMarker( IMavenConstants.MARKER_CONFIGURATION_ID,
+                                            "Project configuration is not up-to-date with pom.xml. Run project configuration update",
+                                            null, null, project );
+    }
+
+    private Manifest loadManifest( IFile mfile )
+        throws IOException, CoreException
+    {
+        InputStream is = mfile.getContents();
+        try
+        {
+            return new Manifest( is );
+        }
+        finally
+        {
+            is.close();
+        }
     }
 }

@@ -40,12 +40,11 @@
     <module>org.sonatype.tycho.m2e.tests</module>
   </modules>
 
-
   <repositories>
     <repository>
       <id>eclipse</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/staging/</url>
+      <url>http://download.eclipse.org/releases/juno/</url>
     </repository>
     <repository>
       <id>m2e</id>

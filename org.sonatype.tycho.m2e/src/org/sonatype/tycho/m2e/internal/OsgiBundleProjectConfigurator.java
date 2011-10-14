@@ -16,6 +16,7 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 import org.apache.maven.plugin.MojoExecution;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -27,6 +28,8 @@ import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
+import org.eclipse.m2e.core.project.configurator.ILifecycleMappingConfiguration;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
@@ -193,22 +196,76 @@ public class OsgiBundleProjectConfigurator
         if ( MavenProjectChangedEvent.KIND_CHANGED == event.getKind()
             && MavenProjectChangedEvent.FLAG_DEPENDENCIES == event.getFlags() )
         {
-            // touch bundle manifests to force regeneration
-
-            IProject project = event.getMavenProject().getProject();
-
-            // unfortunately, this does not work. when workspace autobuild is on, project registry is updated
-            // synchronously from MavenBuilder. this means that any resource changes by this code are not
-            // available when the same MavenBuild runs build participants
-            IFile manifest = PDEProjectHelper.getBundleManifest( project );
-            if ( manifest != null && manifest.isAccessible() )
-            {
-                manifest.touch( monitor );
-            }
-
-            // this is a less pretty way to force bundle manifest regeneration. 
-            // the property is checked and reset by the build participant
-            project.setSessionProperty( PROP_FORCE_GENERATE, "true" );
+            forceManifestRegeneration( event.getMavenProject().getProject(), monitor );
         }
     }
+
+    protected void forceManifestRegeneration( IProject project, IProgressMonitor monitor )
+        throws CoreException
+    {
+        // touch bundle manifests to force regeneration
+
+        // unfortunately, this does not work. when workspace autobuild is on, project registry is updated
+        // synchronously from MavenBuilder. this means that any resource changes by this code are not
+        // available when the same MavenBuild runs build participants
+        IFile manifest = PDEProjectHelper.getBundleManifest( project );
+        if ( manifest != null && manifest.isAccessible() )
+        {
+            manifest.touch( monitor );
+        }
+
+        // this is a less pretty way to force bundle manifest regeneration.
+        // the property is checked and reset by the build participant
+        project.setSessionProperty( PROP_FORCE_GENERATE, "true" );
+    }
+
+    @Override
+    public boolean hasConfigurationChanged( IMavenProjectFacade newFacade,
+                                            ILifecycleMappingConfiguration oldProjectConfiguration,
+                                            MojoExecutionKey key, IProgressMonitor monitor )
+    {
+        if ( super.hasConfigurationChanged( newFacade, oldProjectConfiguration, key, monitor ) )
+        {
+            try
+            {
+                if ( !equalsManifestLocation( newFacade.getMojoExecution( key, monitor ),
+                                              oldProjectConfiguration.getMojoExecutionConfiguration( key ) ) )
+                {
+                    return true;
+                }
+
+                forceManifestRegeneration( newFacade.getProject(), monitor );
+            }
+            catch ( CoreException e )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean equalsManifestLocation( MojoExecution mojoExecution, Xpp3Dom oldConfiguration )
+    {
+        // for now, just compare xml configuration, but ideally, getMetainfPath should be used to determine new manifest
+        // location and the result should be compared to the currently configured PDE manifest location.
+
+        if ( mojoExecution == null )
+        {
+            return true;
+        }
+
+        Xpp3Dom configuration = mojoExecution.getConfiguration();
+
+        Xpp3Dom metainf = getManifestLocation( configuration );
+        Xpp3Dom oldMetainf = getManifestLocation( oldConfiguration );
+
+        return metainf != null ? metainf.equals( oldMetainf ) : oldMetainf == null;
+    }
+
+    protected Xpp3Dom getManifestLocation( Xpp3Dom configuration )
+    {
+        return configuration != null ? configuration.getChild( "manifestLocation" ) : null;
+    }
+
 }
