@@ -1,0 +1,1 @@
+Bundle-SymbolicName=${pom.artifactId};singleton:=true

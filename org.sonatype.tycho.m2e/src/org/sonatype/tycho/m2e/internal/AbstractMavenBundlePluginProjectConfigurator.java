@@ -9,6 +9,7 @@ package org.sonatype.tycho.m2e.internal;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
@@ -21,6 +22,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -31,6 +33,8 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
+import org.eclipse.osgi.util.ManifestElement;
+import org.osgi.framework.BundleException;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 public abstract class AbstractMavenBundlePluginProjectConfigurator
@@ -40,8 +44,7 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
 
     public static final String MOJO_ARTIFACT_ID = "maven-bundle-plugin";
 
-    protected static final QualifiedName PROP_FORCE_GENERATE = new QualifiedName( Activator.PLUGIN_ID,
-                                                                                       "forceGenerate" );
+    protected static final QualifiedName PROP_FORCE_GENERATE = new QualifiedName( Activator.PLUGIN_ID, "forceGenerate" );
 
     static boolean isOsgiBundleProject( IMavenProjectFacade facade, IProgressMonitor monitor )
         throws CoreException
@@ -87,38 +90,107 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
             {
                 BuildContext buildContext = getBuildContext();
                 IMavenProjectFacade facade = getMavenProjectFacade();
-                MavenProject mavenProject = facade.getMavenProject( monitor );
-
                 IProject project = facade.getProject();
                 IFile manifest =
                     project.getFolder( getMetainfPath( facade, getSession(), monitor ) ).getFile( "MANIFEST.MF" );
 
+                // regenerate bundle manifest if any of the following is true
+                // - full workspace build
+                // - PROP_FORCE_GENERATE project session property is set (see the comment below)
+                // - generated bundle manifest changed (why?)
+                // - files under project build output folder changed
+                // - any of included bnd files changed
+
+                boolean generate = IncrementalProjectBuilder.FULL_BUILD == kind;
+
                 // the property is set by OsgiBundleProjectConfigurator.mavenProjectChanged is a workaround for
                 // m2e design limitation, which does not allow project configurators trigger resource deltas
-                // visible to build participants. See comment in OsgiBundleProjectConfigurator.mavenProjectChanged 
-                boolean force = Boolean.parseBoolean( (String) project.getSessionProperty( PROP_FORCE_GENERATE ) );
+                // visible to build participants. See comment in OsgiBundleProjectConfigurator.mavenProjectChanged
+                generate =
+                    generate || Boolean.parseBoolean( (String) project.getSessionProperty( PROP_FORCE_GENERATE ) );
+                // reset FORCE flag so we don't regenerate forever
                 project.setSessionProperty( PROP_FORCE_GENERATE, null );
 
-                // to handle dependency changes, regenerate bundle manifest even if no interesting changes
                 IResourceDelta delta = getDelta( project );
-                if ( !force && manifest.isAccessible() && delta != null
-                    && delta.findMember( manifest.getProjectRelativePath() ) == null )
+
+                generate = generate || isManifestChange( delta, manifest );
+
+                generate = generate || isIncludeChange( buildContext );
+
+                generate = generate || isBuildOutputChange( buildContext, facade.getMavenProject( monitor ) );
+
+                if ( !generate )
                 {
-                    Scanner ds = buildContext.newScanner( new File( mavenProject.getBuild().getOutputDirectory() ) );
-                    ds.scan();
-                    String[] includedFiles = ds.getIncludedFiles();
-                    if ( includedFiles == null || includedFiles.length <= 0 )
-                    {
-                        return null;
-                    }
+                    return null;
                 }
 
                 Set<IProject> projects = super.build( kind, monitor );
                 manifest.refreshLocal( IResource.DEPTH_INFINITE, monitor ); // refresh parent?
-
                 return projects;
             }
 
+            private boolean isIncludeChange( BuildContext buildContext )
+                throws CoreException
+            {
+                IMaven maven = MavenPlugin.getMaven();
+
+                @SuppressWarnings( "unchecked" )
+                Map<String, String> instructions =
+                    maven.getMojoParameterValue( getSession(), getMojoExecution(), "instructions", Map.class );
+
+                if ( instructions == null )
+                {
+                    return false;
+                }
+
+                String include = instructions.get( "_include" );
+                if ( include == null )
+                {
+                    return false;
+                }
+
+                ManifestElement[] elements;
+                try
+                {
+                    elements = ManifestElement.parseHeader( "_include", include );
+                }
+                catch ( BundleException e )
+                {
+                    // assume nothing changed because BND won't be able to parse it either
+                    return false;
+                }
+
+                for ( ManifestElement element : elements )
+                {
+                    String path = element.getValueComponents()[0];
+                    if ( path.startsWith( "-" ) || path.startsWith( "~" ) )
+                    {
+                        path = path.substring( 1 );
+                    }
+
+                    // this does not detect changes in outside ${project.basedir}
+
+                    if ( buildContext.hasDelta( path ) )
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            private boolean isManifestChange( IResourceDelta delta, IFile manifest )
+            {
+                return !manifest.isAccessible() || delta.findMember( manifest.getProjectRelativePath() ) != null;
+            }
+
+            private boolean isBuildOutputChange( BuildContext buildContext, MavenProject mavenProject )
+            {
+                Scanner ds = buildContext.newScanner( new File( mavenProject.getBuild().getOutputDirectory() ) );
+                ds.scan();
+                String[] includedFiles = ds.getIncludedFiles();
+                return includedFiles != null && includedFiles.length > 0;
+            }
         };
     }
 

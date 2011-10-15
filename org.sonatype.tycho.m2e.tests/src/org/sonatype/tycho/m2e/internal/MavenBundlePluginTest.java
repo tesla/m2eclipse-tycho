@@ -180,6 +180,28 @@ public class MavenBundlePluginTest
                                             null, null, project );
     }
 
+    public void testIncludeBndFileChange()
+        throws Exception
+    {
+        IMavenProjectFacade facade = importMavenProject( "projects/maven-bundle-plugin/bnd-file-change", "pom.xml" );
+        IProject project = facade.getProject();
+        IFile mfile = project.getFile( "META-INF/MANIFEST.MF" );
+
+        assertPDEPluginProject( facade, "META-INF/MANIFEST.MF" );
+        assertNoErrors( project );
+
+        Manifest mf = loadManifest( mfile );
+        assertEquals( "bnd-file-change", mf.getMainAttributes().getValue( "Bundle-SymbolicName" ) );
+
+        copyContent( project, new File( "projects/maven-bundle-plugin/bnd-file-change/bnd.bnd-changed" ), "bnd.bnd" );
+        workspace.build( IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor );
+        waitForJobsToComplete();
+        assertNoErrors( project );
+
+        mf = loadManifest( mfile );
+        assertEquals( "bnd-file-change;singleton:=true", mf.getMainAttributes().getValue( "Bundle-SymbolicName" ) );
+    }
+
     private Manifest loadManifest( IFile mfile )
         throws IOException, CoreException
     {
