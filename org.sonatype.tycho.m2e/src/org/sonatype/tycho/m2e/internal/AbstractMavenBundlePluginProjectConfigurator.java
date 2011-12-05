@@ -12,12 +12,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.Scanner;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -45,6 +48,8 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
     public static final String MOJO_ARTIFACT_ID = "maven-bundle-plugin";
 
     protected static final QualifiedName PROP_FORCE_GENERATE = new QualifiedName( Activator.PLUGIN_ID, "forceGenerate" );
+
+    private static final ArtifactVersion VERSION_2_3_6 = new DefaultArtifactVersion( "2.3.6" );
 
     static boolean isOsgiBundleProject( IMavenProjectFacade facade, IProgressMonitor monitor )
         throws CoreException
@@ -206,14 +211,23 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
             // do not generate complete bundle. this is both slow and can produce unexpected workspace changes
             // that will trigger unexpected/endless workspace build.
             // we rely on the fact that ManifestPlugin mojo extends BundlePlugin and does not introduce any
-            // additional parameters, so can run manifest goal in place of bundle goal.
+            // additional required parameters, so can run manifest goal in place of bundle goal.
             MojoDescriptor descriptor = execution.getMojoDescriptor().clone();
             descriptor.setGoal( "manifest" );
             descriptor.setImplementation( "org.apache.felix.bundleplugin.ManifestPlugin" );
             MojoExecution _execution =
                 new MojoExecution( execution.getPlugin(), "manifest", "m2e-tycho:" + execution.getExecutionId()
                     + ":manifest" );
-            _execution.setConfiguration( execution.getConfiguration() );
+            Xpp3Dom configuration = execution.getConfiguration();
+            // workaround for https://issues.apache.org/jira/browse/FELIX-3254
+            if ( VERSION_2_3_6.compareTo( new DefaultArtifactVersion( execution.getVersion() ) ) <= 0 )
+            {
+                configuration = new Xpp3Dom( configuration );
+                Xpp3Dom rebuildBundle = new Xpp3Dom( "rebuildBundle" );
+                rebuildBundle.setValue( "true" );
+                configuration.addChild( rebuildBundle );
+            }
+            _execution.setConfiguration( configuration );
             _execution.setMojoDescriptor( descriptor );
             _execution.setLifecyclePhase( execution.getLifecyclePhase() );
             execution = _execution;
