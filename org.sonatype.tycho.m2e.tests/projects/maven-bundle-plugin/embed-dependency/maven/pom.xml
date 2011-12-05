@@ -7,7 +7,7 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <maven-bundle-plugin.version>2.4.0-SNAPSHOT</maven-bundle-plugin.version>
+    <maven-bundle-plugin.version>2.3.6</maven-bundle-plugin.version>
   </properties>
 
   <dependencies>
@@ -24,6 +24,7 @@
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
+          <rebuildBundle>true</rebuildBundle>
           <instructions>
             <Embed-Dependency>
               decentxml,
@@ -89,6 +90,7 @@
     </pluginManagement>
   </build>
 
+<!-- 
   <pluginRepositories>
     <pluginRepository>
       <id>apache-snapshots</id>
@@ -101,5 +103,5 @@
       </releases>
     </pluginRepository>
   </pluginRepositories>
-
+ -->
 </project>
