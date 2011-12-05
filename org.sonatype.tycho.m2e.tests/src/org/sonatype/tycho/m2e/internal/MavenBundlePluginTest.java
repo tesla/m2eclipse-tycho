@@ -11,6 +11,7 @@ package org.sonatype.tycho.m2e.internal;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.jar.Manifest;
 
 import org.eclipse.core.resources.ICommand;
@@ -19,6 +20,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -37,6 +39,7 @@ import org.eclipse.pde.internal.core.natures.PDE;
 public class MavenBundlePluginTest
     extends AbstractLifecycleMappingTest
 {
+
     public void testImport()
         throws Exception
     {
@@ -60,8 +63,8 @@ public class MavenBundlePluginTest
         // make sure classpath is setup right
         IJavaProject javaProject = JavaCore.create( project );
         IClasspathEntry[] cp = javaProject.getRawClasspath();
-        assertEquals( 3, cp.length );
-        assertEquals( new Path( IClasspathManager.CONTAINER_ID ), cp[2].getPath() );
+        assertNotNull( Arrays.asList( cp ).toString(),
+                       getClasspathEntry( cp, new Path( IClasspathManager.CONTAINER_ID ) ) );
 
         // make sure manifest is generated properly
         project.build( IncrementalProjectBuilder.FULL_BUILD, monitor );
@@ -73,6 +76,19 @@ public class MavenBundlePluginTest
         assertEquals( 2, builders.length );
         assertEquals( "org.eclipse.jdt.core.javabuilder", builders[0].getBuilderName() );
         assertEquals( "org.eclipse.m2e.core.maven2Builder", builders[1].getBuilderName() );
+    }
+
+    private IClasspathEntry getClasspathEntry( IClasspathEntry[] cp, IPath path )
+    {
+        for ( IClasspathEntry cpe : cp )
+        {
+            if ( path.equals( cpe.getPath() ) )
+            {
+                return cpe;
+            }
+        }
+        fail( "Missing classpath entry " + path );
+        return null;
     }
 
     // XXX disabled due to https://issues.sonatype.org/browse/MNGECLIPSE-2724
@@ -127,9 +143,9 @@ public class MavenBundlePluginTest
 
         IJavaProject javaProject = JavaCore.create( maven.getProject() );
         IClasspathEntry[] cp = javaProject.getRawClasspath();
-        assertEquals( 2, cp.length );
-        assertEquals( new Path( IClasspathManager.CONTAINER_ID ), cp[1].getPath() );
-        assertTrue( cp[1].isExported() );
+        IClasspathEntry mavenContainer = getClasspathEntry( cp, new Path( IClasspathManager.CONTAINER_ID ) );
+        assertNotNull( mavenContainer );
+        assertTrue( mavenContainer.isExported() );
 
         IProject project = createExisting( "pde", "projects/maven-bundle-plugin/embed-dependency/pde" );
 
