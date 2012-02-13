@@ -12,7 +12,7 @@
         <version>2.2</version>
         <configuration>
           <archive>
-            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+            <manifestFile>${project.basedir}/META-INF/MANIFEST.MF</manifestFile>
           </archive>
         </configuration>
       </plugin>
@@ -30,7 +30,7 @@
           </execution>
         </executions>
         <configuration>
-          <manifestLocation>META-INF</manifestLocation>
+          <manifestLocation>${project.basedir}/META-INF</manifestLocation>
           <instructions>
             <Bundle-SymbolicName>${pom.artifactId};singleton:=true</Bundle-SymbolicName>
           </instructions>
