@@ -74,7 +74,8 @@ public class MavenLaunchParticipant
     {
         try
         {
-            if ( !configuration.getAttribute( MavenLaunchConstants.ATTR_WORKSPACE_RESOLUTION, false ) )
+            if ( !TychoInsituActivator.isInstrumentationEnabled()
+                || !configuration.getAttribute( MavenLaunchConstants.ATTR_WORKSPACE_RESOLUTION, false ) )
             {
                 return null;
             }
