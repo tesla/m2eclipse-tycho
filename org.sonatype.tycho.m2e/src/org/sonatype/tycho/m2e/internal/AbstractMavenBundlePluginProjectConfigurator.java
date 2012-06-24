@@ -47,7 +47,7 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
 
     public static final String MOJO_ARTIFACT_ID = "maven-bundle-plugin";
 
-    protected static final QualifiedName PROP_FORCE_GENERATE = new QualifiedName( Activator.PLUGIN_ID, "forceGenerate" );
+    protected static final QualifiedName PROP_FORCE_GENERATE = new QualifiedName( M2ETychoActivator.PLUGIN_ID, "forceGenerate" );
 
     private static final ArtifactVersion VERSION_2_3_6 = new DefaultArtifactVersion( "2.3.6" );
 

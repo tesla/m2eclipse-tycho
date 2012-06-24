@@ -14,19 +14,19 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 @SuppressWarnings( { "rawtypes", "unchecked" } )
-public class Activator
+public class M2ETychoActivator
     extends Plugin
 {
 
     public static final String PLUGIN_ID = "org.sonatype.tycho.m2e";
 
-    private static Activator plugin;
+    private static M2ETychoActivator plugin;
 
     private ServiceReference projectServiceRef;
 
     private IBundleProjectService projectService;
 
-    public Activator()
+    public M2ETychoActivator()
     {
     }
 
@@ -53,7 +53,7 @@ public class Activator
         super.stop( context );
     }
 
-    public static Activator getDefault()
+    public static M2ETychoActivator getDefault()
     {
         return plugin;
     }

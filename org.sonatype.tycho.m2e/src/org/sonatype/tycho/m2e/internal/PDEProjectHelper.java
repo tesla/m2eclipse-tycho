@@ -198,7 +198,7 @@ public class PDEProjectHelper
     protected static void setManifestLocaton( IProject project, IPath manifestPath, IProgressMonitor monitor )
         throws CoreException
     {
-        IBundleProjectService projectService = Activator.getDefault().getProjectService();
+        IBundleProjectService projectService = M2ETychoActivator.getDefault().getProjectService();
         if ( manifestPath != null && manifestPath.segmentCount() > 1 )
         {
             IPath metainfPath = manifestPath.removeLastSegments( 1 );
