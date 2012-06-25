@@ -149,11 +149,11 @@ public class MavenLaunchParticipant
 
         try
         {
-            final File stateLocation =
-                File.createTempFile( "launch", null,
-                                     new File( TychoInsituActivator.getDefault().getStateLocation().toOSString() ) );
-            stateLocation.delete();
-            stateLocation.mkdirs();
+            final File stateLocation = File.createTempFile( "m2e-tycho", null );
+            if ( !stateLocation.delete() || !stateLocation.mkdirs() )
+            {
+                throw new IOException( "Could not create temporary folder " + stateLocation.getAbsolutePath() );
+            }
 
             OutputStream os =
                 new BufferedOutputStream( new FileOutputStream( new File( stateLocation, FILE_WORKSPACESTATE ) ) );
