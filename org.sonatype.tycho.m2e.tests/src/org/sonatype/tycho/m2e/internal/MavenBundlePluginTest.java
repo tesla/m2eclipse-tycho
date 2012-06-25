@@ -192,8 +192,8 @@ public class MavenBundlePluginTest
         copyContent( project, new File( "projects/maven-bundle-plugin/pom-change/pom.xml-changed-manifest-location" ),
                      "pom.xml" );
         WorkspaceHelpers.assertErrorMarker( IMavenConstants.MARKER_CONFIGURATION_ID,
-                                            "Project configuration is not up-to-date with pom.xml. Run project configuration update",
-                                            null, null, project );
+                                            "Project configuration is not up-to-date with pom.xml.", null, null,
+                                            project );
     }
 
     public void testIncludeBndFileChange()
