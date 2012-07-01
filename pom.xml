@@ -15,9 +15,9 @@
   </prerequisites>
 
   <parent>
-    <groupId>org.sonatype.forge</groupId>
-    <artifactId>forge-parent</artifactId>
-    <version>10</version>
+    <groupId>io.tesla</groupId>
+    <artifactId>tesla</artifactId>
+    <version>4</version>
   </parent>
 
   <groupId>org.sonatype.tycho.m2e</groupId>
@@ -27,10 +27,9 @@
 
   <properties>
     <m2e-extras.version>0.13.0/N/0.13.0.201106171509</m2e-extras.version>
-
-    <tycho-version>0.13.0</tycho-version>
-
-    <m2e.site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</m2e.site-compressed>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
+    <tycho-version>0.15.0</tycho-version>
+    <m2e.site-compressed>http://repository.tesla.io:8081/nexus/service/local/repositories/m2e.extras/content-compressed/</m2e.site-compressed>  
   </properties>
 
   <modules>
