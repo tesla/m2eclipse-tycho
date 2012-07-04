@@ -15,22 +15,20 @@
   </prerequisites>
 
   <parent>
-    <groupId>io.tesla</groupId>
-    <artifactId>tesla</artifactId>
-    <version>4</version>
+    <groupId>io.tesla.tycho</groupId>
+    <artifactId>tycho-support</artifactId>
+    <version>0.0.4-SNAPSHOT</version>
   </parent>
-
+  
   <groupId>org.sonatype.tycho.m2e</groupId>
   <artifactId>m2eclipse-tycho</artifactId>
   <version>0.7.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <properties>
-    <m2e-extras.version>0.13.0/N/0.13.0.201106171509</m2e-extras.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
-    <tycho-version>0.15.0</tycho-version>
-    <m2e.site-compressed>http://repository.tesla.io:8081/nexus/service/local/repositories/m2e.extras/content-compressed/</m2e.site-compressed>  
-  </properties>
+    <repositoryPathId>m2eclipse-tycho</repositoryPathId>
+    <p2MetadataName>Tycho Project Configurators Update Site</p2MetadataName>
+  </properties>  
 
   <modules>
     <module>org.sonatype.tycho.m2e</module>
@@ -41,16 +39,6 @@
   </modules>
 
   <repositories>
-    <repository>
-      <id>eclipse</id>
-      <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/juno/</url>
-    </repository>
-    <repository>
-      <id>m2e</id>
-      <layout>p2</layout>
-      <url>http://download.eclipse.org/technology/m2e/releases/1.0</url>
-    </repository>
     <repository>
       <id>m2e-extras</id>
       <layout>p2</layout>
@@ -72,33 +60,8 @@
   </pluginRepositories>
 
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-maven-plugin</artifactId>
-        <version>${tycho-version}</version>
-        <extensions>true</extensions>
-      </plugin>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>target-platform-configuration</artifactId>
-        <version>${tycho-version}</version>
-        <configuration>
-          <resolver>p2</resolver>
-          <pomDependencies>consider</pomDependencies>
-          <ignoreTychoRepositories>true</ignoreTychoRepositories>
-        </configuration>
-      </plugin>
-    </plugins>
     <pluginManagement>
       <plugins>
-        <!-- important for self-hosting -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.5</version>
-        </plugin>
-
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-surefire-plugin</artifactId>
@@ -158,7 +121,7 @@
             <plugin>
               <groupId>org.eclipse.tycho</groupId>
               <artifactId>tycho-surefire-plugin</artifactId>
-              <version>${tycho-version}</version>
+              <version>${tychoVersion}</version>
               <configuration>
                 <dependencies combine.children="append">
                   <dependency>
@@ -173,34 +136,6 @@
         </pluginManagement>
       </build>
     </profile>
-
-<!-- 
-    <profile>
-      <id>sign</id>
-      <activation>
-        <property>
-          <name>jarsigner.alias</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jarsigner-plugin</artifactId>
-            <version>1.2</version>
-            <executions>
-              <execution>
-                <id>sign</id>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
- -->
   </profiles>
 
 </project>
