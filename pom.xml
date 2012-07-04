@@ -17,14 +17,14 @@
   <parent>
     <groupId>io.tesla.tycho</groupId>
     <artifactId>tycho-support</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.6</version>
   </parent>
   
   <groupId>org.sonatype.tycho.m2e</groupId>
   <artifactId>m2eclipse-tycho</artifactId>
   <version>0.6.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-
+  
   <properties>
     <repositoryPathId>m2eclipse-tycho</repositoryPathId>
     <p2MetadataName>Tycho Project Configurators Update Site</p2MetadataName>
@@ -38,11 +38,11 @@
   </modules>
 
   <repositories>
-    <repository>
-      <id>m2e-extras</id>
-      <layout>p2</layout>
-      <url>http://repository.sonatype.org/content/sites/forge-sites/m2e-extras/${m2e-extras.version}</url>
-    </repository>
+    <repository>                                                                                                                       
+      <id>m2e-tests</id>                                                                                                         
+      <url>https://repository.sonatype.org/content/sites/forge-sites/m2e/1.1.0/N/1.1.0.20120622-0806/</url>                   
+      <layout>p2</layout>                                                                                                              
+    </repository>       
   </repositories>
 
   <pluginRepositories>
@@ -64,7 +64,7 @@
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-surefire-plugin</artifactId>
-          <version>${tycho-version}</version>
+          <version>${tychoVersion}</version>
           <configuration>
             <dependencies>
               <dependency>

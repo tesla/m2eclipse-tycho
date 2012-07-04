@@ -18,4 +18,5 @@
 
   <artifactId>org.sonatype.tycho.m2e.feature</artifactId>
   <packaging>eclipse-feature</packaging>
+  
 </project>
