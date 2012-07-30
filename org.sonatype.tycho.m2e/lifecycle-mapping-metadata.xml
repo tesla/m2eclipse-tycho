@@ -113,6 +113,7 @@
         <versionRange>[0.12.0,)</versionRange>
         <goals>
           <goal>build-qualifier</goal>
+          <goal>build-qualifier-aggregator</goal>
           <goal>validate-version</goal>
           <goal>validate-id</goal>
         </goals>
