@@ -9,6 +9,7 @@
 package org.sonatype.tycho.m2e.internal;
 
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +74,24 @@ public class OsgiBundleProjectConfigurator
 
         if ( executions.size() != 1 )
         {
-            throw new IllegalArgumentException();
+        	
+        	String executionsString;
+        	if ( executions.size() == 0 )
+        	{
+        		executionsString = "none";
+        	} else {
+            	StringBuilder configurations = new StringBuilder("[");
+            	for ( Iterator<MojoExecution> it = executions.iterator() ; it.hasNext() ; )
+            	{
+            		configurations.append(it.next().getExecutionId());
+            		if ( it.hasNext() )
+            			configurations.append(", ");
+            	}
+            	configurations.append("]");
+        		executionsString = configurations.toString();
+        	}
+        	
+            throw new IllegalArgumentException("Expected exactly one execution but found " + executionsString );
         }
 
         MojoExecution execution = amendMojoExecution( executions.get( 0 ) );
