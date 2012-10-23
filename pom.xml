@@ -40,7 +40,7 @@
   <repositories>
     <repository>
       <id>m2e-tests</id>
-      <url>https://repository.sonatype.org/content/sites/forge-sites/m2e/1.1.0/N/1.1.0.20120622-0806/</url>
+      <url>http://download.eclipse.org/technology/m2e/releases</url>
       <layout>p2</layout>
     </repository>
   </repositories>
