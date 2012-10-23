@@ -47,7 +47,8 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
 
     public static final String MOJO_ARTIFACT_ID = "maven-bundle-plugin";
 
-    protected static final QualifiedName PROP_FORCE_GENERATE = new QualifiedName( M2ETychoActivator.PLUGIN_ID, "forceGenerate" );
+    protected static final QualifiedName PROP_FORCE_GENERATE = new QualifiedName( M2ETychoActivator.PLUGIN_ID,
+                                                                                  "forceGenerate" );
 
     private static final ArtifactVersion VERSION_2_3_6 = new DefaultArtifactVersion( "2.3.6" );
 
@@ -186,7 +187,8 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
 
             private boolean isManifestChange( IResourceDelta delta, IFile manifest )
             {
-                return !manifest.isAccessible() || delta.findMember( manifest.getProjectRelativePath() ) != null;
+                return !manifest.isAccessible()
+                    || ( delta != null && delta.findMember( manifest.getProjectRelativePath() ) != null );
             }
 
             private boolean isBuildOutputChange( BuildContext buildContext, MavenProject mavenProject )
