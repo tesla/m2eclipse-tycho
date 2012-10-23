@@ -101,6 +101,9 @@
           <goal>compile</goal>
           <goal>testCompile</goal>
         </goals>
+        <parameters>
+          <compilerId>jdt</compilerId>
+        </parameters>
       </pluginExecutionFilter>
       <action>
         <ignore />
