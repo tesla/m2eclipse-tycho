@@ -2,7 +2,7 @@
 <feature
       id="org.sonatype.tycho.m2e.feature"
       label="Tycho Project Configurators"
-      version="0.6.0.qualifier"
+      version="0.7.0.qualifier"
       provider-name="Sonatype, Inc.">
 
    <description url="https://docs.sonatype.org/display/M2ECLIPSE/Tycho+project+overview">
