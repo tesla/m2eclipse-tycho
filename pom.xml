@@ -40,7 +40,7 @@
   <repositories>
     <repository>
       <id>m2e-tests</id>
-      <url>http://download.eclipse.org/technology/m2e/releases</url>
+      <url>http://nexus.tesla.io:8081/nexus/content/sites/m2e.extras/m2e/1.4.0/N/LATEST/</url>
       <layout>p2</layout>
     </repository>
   </repositories>

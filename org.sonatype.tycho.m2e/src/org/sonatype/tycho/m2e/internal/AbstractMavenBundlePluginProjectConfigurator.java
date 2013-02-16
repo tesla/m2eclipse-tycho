@@ -14,7 +14,6 @@ import java.util.Set;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -97,8 +96,7 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
                 BuildContext buildContext = getBuildContext();
                 IMavenProjectFacade facade = getMavenProjectFacade();
                 IProject project = facade.getProject();
-                IFile manifest =
-                    project.getFolder( getMetainfPath( facade, getSession(), monitor ) ).getFile( "MANIFEST.MF" );
+                IFile manifest = project.getFolder( getMetainfPath( facade, monitor ) ).getFile( "MANIFEST.MF" );
 
                 // regenerate bundle manifest if any of the following is true
                 // - full workspace build
@@ -121,7 +119,7 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
 
                 generate = generate || isManifestChange( delta, manifest );
 
-                generate = generate || isIncludeChange( buildContext );
+                generate = generate || isIncludeChange( buildContext, monitor );
 
                 generate = generate || isBuildOutputChange( buildContext, facade.getMavenProject( monitor ) );
 
@@ -135,14 +133,16 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
                 return projects;
             }
 
-            private boolean isIncludeChange( BuildContext buildContext )
+            private boolean isIncludeChange( BuildContext buildContext, IProgressMonitor monitor )
                 throws CoreException
             {
                 IMaven maven = MavenPlugin.getMaven();
 
+                MavenProject mavenProject = getMavenProjectFacade().getMavenProject( monitor );
+
                 @SuppressWarnings( "unchecked" )
                 Map<String, String> instructions =
-                    maven.getMojoParameterValue( getSession(), getMojoExecution(), "instructions", Map.class );
+                    maven.getMojoParameterValue( mavenProject, getMojoExecution(), "instructions", Map.class, monitor );
 
                 if ( instructions == null )
                 {
@@ -240,14 +240,15 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
     /**
      * Returns project relative path of the <b>folder</b> where the generated manifest is or will be written
      */
-    static IPath getMetainfPath( IMavenProjectFacade facade, MavenSession session, IProgressMonitor monitor )
+    static IPath getMetainfPath( IMavenProjectFacade facade, IProgressMonitor monitor )
         throws CoreException
     {
         IMaven maven = MavenPlugin.getMaven();
         for ( MojoExecution execution : facade.getMojoExecutions( MOJO_GROUP_ID, MOJO_ARTIFACT_ID, monitor, "manifest",
                                                                   "bundle" ) )
         {
-            File location = maven.getMojoParameterValue( session, execution, "manifestLocation", File.class );
+            MavenProject mavenProject = facade.getMavenProject( monitor );
+            File location = maven.getMojoParameterValue( mavenProject, execution, "manifestLocation", File.class, monitor );
             if ( location != null )
             {
                 return facade.getProjectRelativePath( location.getAbsolutePath() );
