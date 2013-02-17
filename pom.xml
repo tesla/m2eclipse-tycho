@@ -40,7 +40,7 @@
   <repositories>
     <repository>
       <id>m2e-tests</id>
-      <url>http://nexus.tesla.io:8081/nexus/content/sites/m2e.extras/m2e/1.4.0/N/LATEST/</url>
+      <url>http://repository.tesla.io:8081/nexus/content/sites/m2e.extras/m2e/1.4.0/N/LATEST/</url>
       <layout>p2</layout>
     </repository>
   </repositories>
@@ -107,8 +107,9 @@
       <id>osx</id>
       <activation>
         <property>
-          <name>java.vendor.url</name>
-          <value>http://www.apple.com/</value>
+          <!-- as of java7, java.vendor.url is oracle now and can't be used to detect osx any more -->
+          <name>os.name</name>
+          <value>Mac OS X</value>
         </property>
       </activation>
       <properties>
