@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: local-jar-classpath
+Bundle-SymbolicName: local-jar-classpath;singleton:=true
+Bundle-Version: 0.0.1.qualifier
+Bundle-Vendor: fred
+Bundle-ClassPath: .,
+ lib/local-jar-classpath.jar
