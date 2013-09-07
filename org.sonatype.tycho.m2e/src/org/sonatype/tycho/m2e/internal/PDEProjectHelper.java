@@ -131,7 +131,6 @@ public class PDEProjectHelper
 
         // PDE can't handle default JDT classpath
         IJavaProject javaProject = JavaCore.create( project );
-        javaProject.setRawClasspath( new IClasspathEntry[0], true, monitor );
         javaProject.setOutputLocation( getOutputLocation( project, mavenProject, monitor ), monitor );
 
         // see org.eclipse.pde.internal.ui.wizards.tools.UpdateClasspathJob
@@ -236,10 +235,10 @@ public class PDEProjectHelper
     private static void setClasspath( IProject project, IPluginModelBase model, IProgressMonitor monitor )
         throws CoreException
     {
-        ClasspathComputer.setClasspath( project, model );
-
+        IClasspathEntry[] entries = ClasspathComputer.getClasspath(project, model, null, true /*clear existing entries*/, true);
+        JavaCore.create(project).setRawClasspath(entries, null);
         // workaround PDE sloppy model management during the first multimodule project import in eclipse session
-        // 1. m2e creates all modules as simple workspace projects without JDT or PDE nattues
+        // 1. m2e creates all modules as simple workspace projects without JDT or PDE natures
         // 2. first call to org.eclipse.pde.internal.core.PluginModelManager.initializeTable() reads all workspace
         // projects regardless of their natures (see https://bugs.eclipse.org/bugs/show_bug.cgi?id=319268)
         // 3. going through all projects one by one
@@ -248,7 +247,7 @@ public class PDEProjectHelper
         // that do not have JAVA nature. at this point PDE classpath is missing some/all workspace dependencies.
         // 4. PDE does not re-resolve classpath when dependencies get JAVA nature enabled
 
-        // as a workaround, touch project bundle manifests to force PDE re-read the model, reresolve dependencies
+        // as a workaround, touch project bundle manifests to force PDE re-read the model, re-resolve dependencies
         // and recalculate PDE classpath
 
         IFile manifest = PDEProjectHelper.getBundleManifest( project );
