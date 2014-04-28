@@ -26,7 +26,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <tychoVersion>0.18.1</tychoVersion>  
+    <tychoVersion>0.20.0</tychoVersion>  
     <repositoryPathId>m2eclipse-tycho</repositoryPathId>
     <p2MetadataName>Tycho Project Configurators Update Site</p2MetadataName>
     <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
