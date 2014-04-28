@@ -42,7 +42,7 @@
   <repositories>
     <repository>
       <id>m2e-tests</id>
-      <url>http://repository.tesla.io:8081/nexus/content/sites/m2e.extras/m2e/1.5.0/N/LATEST/</url>
+      <url>http://download.eclipse.org/technology/m2e/milestones/1.5/</url>
       <layout>p2</layout>
     </repository>
   </repositories>
