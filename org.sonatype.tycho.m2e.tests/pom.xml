@@ -37,6 +37,7 @@
             <dependency>
               <!-- as of eclipse 4.4/luna PDE requires the PlatformAdmin service to operate -->
               <artifactId>org.eclipse.osgi.compatibility.state</artifactId>
+              <version>0.0.0</version>
               <type>eclipse-plugin</type>
             </dependency>
           </dependencies>
