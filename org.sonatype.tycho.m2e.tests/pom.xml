@@ -33,6 +33,13 @@
           <!-- kill test JVM if tests take more than 10 minutes (600 seconds) to finish -->
           <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
           <argLine>${tycho.test.jvmArgs}</argLine>
+          <dependencies>
+            <dependency>
+              <!-- as of eclipse 4.4/luna PDE requires the PlatformAdmin service to operate -->
+              <artifactId>org.eclipse.osgi.compatibility.state</artifactId>
+              <type>eclipse-plugin</type>
+            </dependency>
+          </dependencies>
         </configuration>
       </plugin>
     </plugins>
