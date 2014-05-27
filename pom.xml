@@ -17,7 +17,7 @@
   <parent>
     <groupId>io.tesla.tycho</groupId>
     <artifactId>tycho-support</artifactId>
-    <version>0.0.6</version>
+    <version>0.0.10</version>
   </parent>
 
   <groupId>org.sonatype.tycho.m2e</groupId>
@@ -26,7 +26,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <tychoVersion>0.18.1</tychoVersion>  
+    <tychoVersion>0.20.0</tychoVersion>
     <repositoryPathId>m2eclipse-tycho</repositoryPathId>
     <p2MetadataName>Tycho Project Configurators Update Site</p2MetadataName>
     <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
@@ -42,7 +42,7 @@
   <repositories>
     <repository>
       <id>m2e-tests</id>
-      <url>http://repository.tesla.io:8081/nexus/content/sites/m2e.extras/m2e/1.5.0/N/LATEST/</url>
+      <url>http://repository.tesla.io:8081/nexus/content/sites/m2e.extras/m2e/1.6.0/N/LATEST/</url>
       <layout>p2</layout>
     </repository>
   </repositories>
