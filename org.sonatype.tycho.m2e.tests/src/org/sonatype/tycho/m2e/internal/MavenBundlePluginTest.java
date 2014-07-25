@@ -218,6 +218,16 @@ public class MavenBundlePluginTest
         assertEquals( "bnd-file-change;singleton:=true", mf.getMainAttributes().getValue( "Bundle-SymbolicName" ) );
     }
 
+    public void testv250Support()
+        throws Exception
+    {
+        IMavenProjectFacade facade = importMavenProject( "projects/maven-bundle-plugin/v2.5.0-support", "pom.xml" );
+        waitForJobsToComplete();
+        workspace.build( IncrementalProjectBuilder.FULL_BUILD, monitor );
+        waitForJobsToComplete();
+        assertNoErrors( facade.getProject() );
+    }
+
     private Manifest loadManifest( IFile mfile )
         throws IOException, CoreException
     {
