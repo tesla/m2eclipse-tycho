@@ -17,7 +17,7 @@
   <parent>
     <groupId>io.tesla.tycho</groupId>
     <artifactId>tycho-support</artifactId>
-    <version>0.0.12</version>
+    <version>0.0.13</version>
   </parent>
 
   <groupId>org.sonatype.tycho.m2e</groupId>
@@ -26,10 +26,8 @@
   <packaging>pom</packaging>
 
   <properties>
-    <tychoVersion>0.20.0</tychoVersion>
     <repositoryPathId>m2eclipse-tycho</repositoryPathId>
     <p2MetadataName>Tycho Project Configurators Update Site</p2MetadataName>
-    <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
   </properties>
 
   <modules>
@@ -47,28 +45,14 @@
     </repository>
   </repositories>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>sonatype-public</id>
-      <url>http://repository.sonatype.org/content/groups/sonatype-public-grid</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </pluginRepository>
-  </pluginRepositories>
-
   <build>
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-surefire-plugin</artifactId>
-          <version>${tychoVersion}</version>
           <configuration>
-            <dependencies>
+            <dependencies combine.children="append">
               <dependency>
                 <artifactId>org.eclipse.ui.workbench</artifactId>
                 <version>3.102.0</version>
@@ -84,47 +68,17 @@
                 <version>0.0.0</version>
                 <type>eclipse-plugin</type>
               </dependency>
+              <dependency>
+                <!-- as of eclipse 4.4/luna, PDE requires PlatformAdmin service to operate -->
+                <artifactId>org.eclipse.osgi.compatibility.state</artifactId>
+                <version>0.0.0</version>
+                <type>eclipse-plugin</type>
+              </dependency>
             </dependencies>
           </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
   </build>
-
-  <profiles>
-    <profile>
-      <id>osx</id>
-      <activation>
-        <property>
-          <!-- as of java7, java.vendor.url is oracle now and can't be used to detect osx any more -->
-          <name>os.name</name>
-          <value>Mac OS X</value>
-        </property>
-      </activation>
-      <properties>
-        <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m -XstartOnFirstThread</tycho.test.jvmArgs>
-      </properties>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.eclipse.tycho</groupId>
-              <artifactId>tycho-surefire-plugin</artifactId>
-              <version>${tychoVersion}</version>
-              <configuration>
-                <dependencies combine.children="append">
-                  <dependency>
-                    <artifactId>org.eclipse.jdt.launching.macosx</artifactId>
-                    <version>3.2.100</version>
-                    <type>eclipse-plugin</type>
-                  </dependency>
-                </dependencies>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-  </profiles>
 
 </project>

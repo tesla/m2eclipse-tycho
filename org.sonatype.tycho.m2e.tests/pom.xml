@@ -7,7 +7,7 @@
   http://www.eclipse.org/legal/epl-v10.html
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -19,30 +19,4 @@
   <artifactId>org.sonatype.tycho.m2e.tests</artifactId>
   <packaging>eclipse-test-plugin</packaging>
 
-  <build>
-    <sourceDirectory>src</sourceDirectory>
-    
-    <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-surefire-plugin</artifactId>
-        <version>${tychoVersion}</version>
-        <configuration>
-          <appArgLine>-pluginCustomization ${basedir}/plugin_customization.ini</appArgLine>
-          <useUIHarness>true</useUIHarness>
-          <!-- kill test JVM if tests take more than 10 minutes (600 seconds) to finish -->
-          <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
-          <argLine>${tycho.test.jvmArgs}</argLine>
-          <dependencies>
-            <dependency>
-              <!-- as of eclipse 4.4/luna PDE requires the PlatformAdmin service to operate -->
-              <artifactId>org.eclipse.osgi.compatibility.state</artifactId>
-              <version>0.0.0</version>
-              <type>eclipse-plugin</type>
-            </dependency>
-          </dependencies>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
