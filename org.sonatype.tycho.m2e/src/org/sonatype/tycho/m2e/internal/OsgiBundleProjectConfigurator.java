@@ -71,12 +71,28 @@ public class OsgiBundleProjectConfigurator
     {
         List<MojoExecution> executions = getMojoExecutions( request, monitor );
 
-        if ( executions.size() != 1 )
+        if ( executions.size() == 0 )
         {
             throw new IllegalArgumentException();
         }
 
-        MojoExecution execution = amendMojoExecution( executions.get( 0 ) );
+        MojoExecution bundleExecution = null;
+
+        for ( MojoExecution execution : executions )
+        {
+            if ( "bundle".equals( execution.getGoal() ) )
+            {
+                bundleExecution = execution;
+                break;
+            }
+        }
+
+        if ( bundleExecution == null )
+        {
+            bundleExecution = executions.get( 0 );
+        }
+
+        MojoExecution execution = amendMojoExecution( bundleExecution );
 
         maven.execute( request.getMavenProject(), execution, monitor );
 
@@ -170,6 +186,11 @@ public class OsgiBundleProjectConfigurator
                                        IProgressMonitor monitor )
         throws CoreException
     {
+        if ( !isOsgiBundleProject( request.getMavenProjectFacade(), monitor ) )
+        {
+            return;
+        }
+
         // export maven dependencies classpath container, so dependent project can compile against embedded transitive
         // dependencies.
         // This breaks JDT classpath of plain maven dependents of this project, i.e. such dependents will be exposed to
