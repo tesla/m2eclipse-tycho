@@ -9,6 +9,7 @@
 package org.sonatype.tycho.m2e.internal;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,12 +19,17 @@ import java.util.jar.Manifest;
 import org.apache.maven.plugin.MojoExecution;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
+import org.eclipse.m2e.core.internal.markers.SourceLocation;
+import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
@@ -39,15 +45,19 @@ import org.eclipse.osgi.util.ManifestElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings( "restriction" )
 public class OsgiBundleProjectConfigurator
     extends AbstractMavenBundlePluginProjectConfigurator
     implements IJavaProjectConfigurator
 {
+
     private static final Logger log = LoggerFactory.getLogger( OsgiBundleProjectConfigurator.class );
 
     public static final String ATTR_BUNDLE_CLASSPATH = "Tycho-Bundle-ClassPath";
 
     private static final String EMBEDDED_ARTIFACTS = "Embedded-Artifacts";
+
+    private boolean enableBuildParticipant = true;
 
     @Override
     public void configure( ProjectConfigurationRequest request, IProgressMonitor monitor )
@@ -58,6 +68,25 @@ public class OsgiBundleProjectConfigurator
             throw new IllegalArgumentException();
         }
 
+        List<MojoExecution> executions = getMojoExecutions( request, monitor );
+
+        if ( executions.size() > 1 )
+        {
+            List<MavenProblemInfo> errors  = new ArrayList<MavenProblemInfo>();
+
+            for( MojoExecution mojoExecution : executions )
+            {
+                SourceLocation location = SourceLocationHelper.findLocation( mojoExecution.getPlugin(), "executions" );
+                MavenProblemInfo problem =
+                    new MavenProblemInfo( "Duplicate " + mojoExecution.getGoal() +
+                        " executions found. Please remove any explicitly defined " + mojoExecution.getGoal() +
+                        " executions in your pom.xml.", IMarker.SEVERITY_ERROR, location );
+                errors.add( problem );
+            }
+
+            this.markerManager.addErrorMarkers( request.getPom(), IMavenConstants.MARKER_LIFECYCLEMAPPING_ID, errors );
+        }
+
         // bundle manifest is generated in #configureRawClasspath, which is invoked earlier during project configuration
 
         IProject project = request.getProject();
@@ -66,16 +95,10 @@ public class OsgiBundleProjectConfigurator
         PDEProjectHelper.addPDENature( project, getMetainfPath( facade, monitor ), monitor );
     }
 
-    private void generateBundleManifest( ProjectConfigurationRequest request, IProgressMonitor monitor )
+    private void generateBundleManifest( ProjectConfigurationRequest request, List<MojoExecution> executions ,
+                                         IProgressMonitor monitor )
         throws CoreException
     {
-        List<MojoExecution> executions = getMojoExecutions( request, monitor );
-
-        if ( executions.size() != 1 )
-        {
-            throw new IllegalArgumentException();
-        }
-
         MojoExecution execution = amendMojoExecution( executions.get( 0 ) );
 
         maven.execute( request.getMavenProject(), execution, monitor );
@@ -89,7 +112,14 @@ public class OsgiBundleProjectConfigurator
     public AbstractBuildParticipant getBuildParticipant( IMavenProjectFacade projectFacade, MojoExecution execution,
                                                          IPluginExecutionMetadata executionMetadata )
     {
-        return getBuildParticipant( execution );
+        if ( this.enableBuildParticipant )
+        {
+            return getBuildParticipant( execution );
+        }
+        else
+        {
+            return null;
+        }
     }
 
     @Override
@@ -175,7 +205,18 @@ public class OsgiBundleProjectConfigurator
         // This breaks JDT classpath of plain maven dependents of this project, i.e. such dependents will be exposed to
         // more classes compared to CLI build. Not sure what to do about it yet.
 
-        generateBundleManifest( request, monitor );
+        List<MojoExecution> executions = getMojoExecutions( request, monitor );
+
+        if ( executions.size() == 1 )
+        {
+            generateBundleManifest( request, executions, monitor );
+
+            this.enableBuildParticipant = true;
+        }
+        else
+        {
+            this.enableBuildParticipant = false; // invalid configuration markers will be added in the configure() method
+        }
 
         if ( !getBundleClasspathMap( request.getMavenProjectFacade() ).isEmpty() )
         {
