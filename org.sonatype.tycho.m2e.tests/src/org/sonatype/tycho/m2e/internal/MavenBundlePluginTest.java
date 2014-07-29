@@ -26,8 +26,11 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.tests.common.AbstractLifecycleMappingTest;
 import org.eclipse.m2e.tests.common.WorkspaceHelpers;
@@ -216,6 +219,39 @@ public class MavenBundlePluginTest
 
         mf = loadManifest( mfile );
         assertEquals( "bnd-file-change;singleton:=true", mf.getMainAttributes().getValue( "Bundle-SymbolicName" ) );
+    }
+
+    public void testMultipleExecutionsErrorMarkers()
+        throws Exception
+    {
+        IMavenProjectFacade facade = importMavenProject( "projects/maven-bundle-plugin/multiple-executions", "pom.xml" );
+        IProject[] projects = new IProject[] { facade.getProject() };
+
+        waitForJobsToComplete();
+        workspace.build( IncrementalProjectBuilder.FULL_BUILD, monitor );
+
+        ProjectConfigurationManager configurationManager =
+            (ProjectConfigurationManager) MavenPlugin.getProjectConfigurationManager();
+        MavenUpdateRequest request = new MavenUpdateRequest(projects, false, true);
+        configurationManager.updateProjectConfiguration(request, true, true, true, monitor);
+
+        waitForJobsToComplete();
+
+        WorkspaceHelpers.assertErrorMarker(
+            IMavenConstants.MARKER_LIFECYCLEMAPPING_ID,
+            "Duplicate bundle executions found. Please remove any explicitly defined bundle executions in your pom.xml.",
+            null, "pom.xml", facade.getProject() );
+
+        // update the pom and recheck that markers are gone
+        copyContent(
+            facade.getProject(),
+            new File( "projects/maven-bundle-plugin/multiple-executions/validpom.xml" ), "pom.xml" );
+
+        request = new MavenUpdateRequest(projects, false, true);
+        configurationManager.updateProjectConfiguration(request, true, true, true, monitor);
+
+        waitForJobsToComplete();
+        assertNoErrors( projects[0] );
     }
 
     private Manifest loadManifest( IFile mfile )
