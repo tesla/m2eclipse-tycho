@@ -9,7 +9,7 @@
     <version>0.7.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>org.sonatype.tycho.update</artifactId>
-  <packaging>eclipse-update-site</packaging>
+  <artifactId>org.sonatype.tycho.repository</artifactId>
+  <packaging>eclipse-repository</packaging>
 
 </project>

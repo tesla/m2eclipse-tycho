@@ -15,9 +15,9 @@
   </prerequisites>
 
   <parent>
-    <groupId>io.tesla.tycho</groupId>
+    <groupId>io.takari.tycho</groupId>
     <artifactId>tycho-support</artifactId>
-    <version>0.0.13</version>
+    <version>0.14.0</version>
   </parent>
 
   <groupId>org.sonatype.tycho.m2e</groupId>
@@ -33,17 +33,9 @@
   <modules>
     <module>org.sonatype.tycho.m2e</module>
     <module>org.sonatype.tycho.m2e.feature</module>
-    <module>org.sonatype.tycho.update</module>
+    <module>org.sonatype.tycho.repository</module>
     <module>org.sonatype.tycho.m2e.tests</module>
   </modules>
-
-  <repositories>
-    <repository>
-      <id>m2e-tests</id>
-      <url>http://repository.tesla.io:8081/nexus/content/sites/m2e.extras/m2e/1.6.0/N/LATEST/</url>
-      <layout>p2</layout>
-    </repository>
-  </repositories>
 
   <build>
     <pluginManagement>
