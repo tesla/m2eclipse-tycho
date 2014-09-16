@@ -232,23 +232,21 @@ public class MavenBundlePluginTest
 
         ProjectConfigurationManager configurationManager =
             (ProjectConfigurationManager) MavenPlugin.getProjectConfigurationManager();
-        MavenUpdateRequest request = new MavenUpdateRequest(projects, false, true);
-        configurationManager.updateProjectConfiguration(request, true, true, true, monitor);
+        MavenUpdateRequest request = new MavenUpdateRequest( projects, false, true );
+        configurationManager.updateProjectConfiguration( request, true, true, true, monitor );
 
         waitForJobsToComplete();
 
-        WorkspaceHelpers.assertErrorMarker(
-            IMavenConstants.MARKER_LIFECYCLEMAPPING_ID,
-            "Duplicate bundle executions found. Please remove any explicitly defined bundle executions in your pom.xml.",
-            null, "pom.xml", facade.getProject() );
+        WorkspaceHelpers.assertErrorMarker( IMavenConstants.MARKER_LIFECYCLEMAPPING_ID,
+                                            "Duplicate bundle executions found. Please remove any explicitly defined bundle executions in your pom.xml.",
+                                            null, "pom.xml", facade.getProject() );
 
         // update the pom and recheck that markers are gone
-        copyContent(
-            facade.getProject(),
-            new File( "projects/maven-bundle-plugin/multiple-executions/validpom.xml" ), "pom.xml" );
+        copyContent( facade.getProject(), new File( "projects/maven-bundle-plugin/multiple-executions/validpom.xml" ),
+                     "pom.xml" );
 
-        request = new MavenUpdateRequest(projects, false, true);
-        configurationManager.updateProjectConfiguration(request, true, true, true, monitor);
+        request = new MavenUpdateRequest( projects, false, true );
+        configurationManager.updateProjectConfiguration( request, true, true, true, monitor );
 
         waitForJobsToComplete();
         assertNoErrors( projects[0] );

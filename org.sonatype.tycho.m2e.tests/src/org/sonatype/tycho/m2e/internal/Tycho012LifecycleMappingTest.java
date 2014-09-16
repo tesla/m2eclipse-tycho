@@ -77,8 +77,7 @@ public class Tycho012LifecycleMappingTest
         throws Exception
     {
         IMavenProjectFacade facade =
-            importProjectAndAssertLifecycleMappingType( "projects/tycho-0.12",
-                                                        "tycho-eclipse-test-plugin/pom.xml" );
+            importProjectAndAssertLifecycleMappingType( "projects/tycho-0.12", "tycho-eclipse-test-plugin/pom.xml" );
 
         IProject project = facade.getProject();
         assertTrue( project.hasNature( PDE.PLUGIN_NATURE ) );
@@ -107,8 +106,7 @@ public class Tycho012LifecycleMappingTest
         throws Exception
     {
         IMavenProjectFacade facade =
-            importProjectAndAssertLifecycleMappingType( "projects/tycho-0.12",
-                                                        "tycho-eclipse-update-site/pom.xml" );
+            importProjectAndAssertLifecycleMappingType( "projects/tycho-0.12", "tycho-eclipse-update-site/pom.xml" );
 
         IProject project = facade.getProject();
         assertTrue( project.hasNature( PDE.SITE_NATURE ) );

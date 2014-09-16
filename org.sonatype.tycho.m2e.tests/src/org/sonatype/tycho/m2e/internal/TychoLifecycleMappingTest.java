@@ -115,35 +115,34 @@ public class TychoLifecycleMappingTest
         IProject project = facade.getProject();
         assertTrue( project.hasNature( PDE.SITE_NATURE ) );
     }
-    
-    
+
     public void testUpdateWhenJarInClasspath_EclipsePlugin()
-            throws Exception
-        {
-            IMavenProjectFacade facade =
-                importProjectAndAssertLifecycleMappingType( "projects/local-jar-classpath", "pom.xml" );
+        throws Exception
+    {
+        IMavenProjectFacade facade =
+            importProjectAndAssertLifecycleMappingType( "projects/local-jar-classpath", "pom.xml" );
 
-            IProject project = facade.getProject();
-            assertTrue( project.hasNature( PDE.PLUGIN_NATURE ) );
-            assertTrue( project.hasNature( JavaCore.NATURE_ID ) );
-            IPluginModelBase model = PluginRegistry.findModel( project );
-            assertNotNull( model );
+        IProject project = facade.getProject();
+        assertTrue( project.hasNature( PDE.PLUGIN_NATURE ) );
+        assertTrue( project.hasNature( JavaCore.NATURE_ID ) );
+        IPluginModelBase model = PluginRegistry.findModel( project );
+        assertNotNull( model );
 
-            IJavaProject jproject = JavaCore.create(project);
-            assertNotNull(jproject);
-            IClasspathEntry[] classpathEntries = jproject.getRawClasspath();
-            assertEquals( 4, classpathEntries.length );
-            MavenPlugin.getProjectConfigurationManager().updateProjectConfiguration(project, monitor);
-            jproject = null;
-            waitForJobsToComplete();
-            
-            jproject = JavaCore.create(project);
-            classpathEntries = jproject.getRawClasspath();
-            assertEquals( 4, classpathEntries.length );
-            assertClasspathContains( classpathEntries, "org.eclipse.jdt.launching.JRE_CONTAINER" );
-            assertClasspathContains( classpathEntries, "org.eclipse.pde.core.requiredPlugins" );
-            assertClasspathContains( classpathEntries, "/local-jar-classpath/src/main/java/" );
-            assertClasspathContains( classpathEntries, "/local-jar-classpath/lib/local-jar-classpath.jar" );
-            
-        }
+        IJavaProject jproject = JavaCore.create( project );
+        assertNotNull( jproject );
+        IClasspathEntry[] classpathEntries = jproject.getRawClasspath();
+        assertEquals( 4, classpathEntries.length );
+        MavenPlugin.getProjectConfigurationManager().updateProjectConfiguration( project, monitor );
+        jproject = null;
+        waitForJobsToComplete();
+
+        jproject = JavaCore.create( project );
+        classpathEntries = jproject.getRawClasspath();
+        assertEquals( 4, classpathEntries.length );
+        assertClasspathContains( classpathEntries, "org.eclipse.jdt.launching.JRE_CONTAINER" );
+        assertClasspathContains( classpathEntries, "org.eclipse.pde.core.requiredPlugins" );
+        assertClasspathContains( classpathEntries, "/local-jar-classpath/src/main/java/" );
+        assertClasspathContains( classpathEntries, "/local-jar-classpath/lib/local-jar-classpath.jar" );
+
+    }
 }
