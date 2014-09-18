@@ -59,6 +59,8 @@ public class MavenBundlePluginConfigurator
 
     private static final ArtifactVersion VERSION_2_3_6 = new DefaultArtifactVersion( "2.3.6" );
 
+    public static final String PARAM_MANIFESTLOCATION = "manifestLocation";
+
     @Override
     public void configure( ProjectConfigurationRequest request, IProgressMonitor monitor )
         throws CoreException
@@ -233,7 +235,7 @@ public class MavenBundlePluginConfigurator
         throws CoreException
     {
         File manifestFile =
-            getParameterValue( facade.getMavenProject(), "manifestLocation", File.class, execution, monitor );
+            getParameterValue( facade.getMavenProject(), PARAM_MANIFESTLOCATION, File.class, execution, monitor );
         IPath projectPath = facade.getProjectRelativePath( manifestFile.getAbsolutePath() ).append( "MANIFEST.MF" );
         return facade.getProject().getFile( projectPath );
     }
@@ -284,7 +286,7 @@ public class MavenBundlePluginConfigurator
 
     protected Xpp3Dom getManifestLocation( Xpp3Dom configuration )
     {
-        return configuration != null ? configuration.getChild( "manifestLocation" ) : null;
+        return configuration != null ? configuration.getChild( PARAM_MANIFESTLOCATION ) : null;
     }
 
     protected void forceManifestRegeneration( IProject project, IProgressMonitor monitor )

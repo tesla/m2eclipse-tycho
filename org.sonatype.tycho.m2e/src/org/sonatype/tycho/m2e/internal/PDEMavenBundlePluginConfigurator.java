@@ -33,6 +33,7 @@ import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
 import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.IJavaProjectConfigurator;
+import static org.sonatype.tycho.m2e.felix.internal.MavenBundlePluginConfigurator.PARAM_MANIFESTLOCATION;
 
 @SuppressWarnings( "restriction" )
 public class PDEMavenBundlePluginConfigurator
@@ -103,7 +104,7 @@ public class PDEMavenBundlePluginConfigurator
         {
             MavenProject mavenProject = facade.getMavenProject( monitor );
             File location =
-                maven.getMojoParameterValue( mavenProject, execution, "manifestLocation", File.class, monitor );
+                maven.getMojoParameterValue( mavenProject, execution, PARAM_MANIFESTLOCATION, File.class, monitor );
             if ( location != null )
             {
                 return facade.getProjectRelativePath( location.getAbsolutePath() );
