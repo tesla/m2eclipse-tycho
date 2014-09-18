@@ -19,6 +19,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.Scanner;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -69,11 +70,10 @@ public class MavenBundlePluginConfigurator
     }
 
     @Override
-    public AbstractBuildParticipant getBuildParticipant( IMavenProjectFacade projectFacade, MojoExecution execution,
+    public AbstractBuildParticipant getBuildParticipant( IMavenProjectFacade projectFacade,
+                                                         final MojoExecution execution,
                                                          IPluginExecutionMetadata executionMetadata )
     {
-        final MojoExecution _execution = amendMojoExecution( execution );
-
         return new AbstractBuildParticipant()
         {
             @Override
@@ -84,6 +84,13 @@ public class MavenBundlePluginConfigurator
                 IMavenProjectFacade facade = getMavenProjectFacade();
                 IProject project = facade.getProject();
                 MavenProject mavenProject = facade.getMavenProject( monitor );
+
+                @SuppressWarnings( "unchecked" )
+                Map<String, String> instructions =
+                    maven.getMojoParameterValue( mavenProject, execution, "instructions", Map.class, monitor );
+
+                MojoExecution _execution = amendMojoExecution( execution, instructions );
+
                 IFile manifest = getManifestFile( facade, _execution, monitor );
 
                 // regenerate bundle manifest if any of the following is true
@@ -107,7 +114,7 @@ public class MavenBundlePluginConfigurator
 
                 generate = generate || isManifestChange( delta, manifest );
 
-                generate = generate || isIncludeChange( buildContext, mavenProject, monitor );
+                generate = generate || isIncludeChange( buildContext, instructions );
 
                 generate = generate || isBuildOutputChange( buildContext, facade.getMavenProject( monitor ) );
 
@@ -120,17 +127,30 @@ public class MavenBundlePluginConfigurator
 
                 manifest.refreshLocal( IResource.DEPTH_INFINITE, monitor ); // refresh parent?
 
+                if ( isDeclerativeServices( instructions ) )
+                {
+                    IFolder outputFolder = getOutputFolder( monitor, facade, _execution );
+                    outputFolder.getFolder( "OSGI-OPT" ).refreshLocal( IResource.DEPTH_INFINITE, monitor );
+                    outputFolder.getFolder( "OSGI-INF" ).refreshLocal( IResource.DEPTH_INFINITE, monitor );
+                }
+
                 return null;
             }
 
-            private boolean isIncludeChange( BuildContext buildContext, MavenProject mavenProject,
-                                             IProgressMonitor monitor )
+            protected IFolder getOutputFolder( IProgressMonitor monitor, IMavenProjectFacade facade,
+                                               MojoExecution _execution )
                 throws CoreException
             {
-                @SuppressWarnings( "unchecked" )
-                Map<String, String> instructions =
-                    maven.getMojoParameterValue( mavenProject, _execution, "instructions", Map.class, monitor );
+                File outputDirectory =
+                    getParameterValue( facade.getMavenProject(), "outputDirectory", File.class, _execution, monitor );
+                IPath outputPath = facade.getProjectRelativePath( outputDirectory.getAbsolutePath() );
+                IFolder outputFolder = facade.getProject().getFolder( outputPath );
+                return outputFolder;
+            }
 
+            private boolean isIncludeChange( BuildContext buildContext, Map<String, String> instructions )
+                throws CoreException
+            {
                 if ( instructions == null )
                 {
                     return false;
@@ -186,10 +206,28 @@ public class MavenBundlePluginConfigurator
                 return includedFiles != null && includedFiles.length > 0;
             }
 
+            @Override
+            public void clean( IProgressMonitor monitor )
+                throws CoreException
+            {
+                IMavenProjectFacade facade = getMavenProjectFacade();
+
+                @SuppressWarnings( "unchecked" )
+                Map<String, String> instructions =
+                    maven.getMojoParameterValue( facade.getMavenProject( monitor ), execution, "instructions",
+                                                 Map.class, monitor );
+
+                if ( isDeclerativeServices( instructions ) )
+                {
+                    IFolder outputFolder = getOutputFolder( monitor, facade, execution );
+                    outputFolder.getFolder( "OSGI-OPT" ).delete( true, monitor );
+                    outputFolder.getFolder( "OSGI-INF" ).delete( true, monitor );
+                }
+            }
         };
     }
 
-    protected static MojoExecution amendMojoExecution( MojoExecution execution )
+    protected static MojoExecution amendMojoExecution( MojoExecution execution, Map<String, String> instructions )
     {
         if ( "bundle".equals( execution.getGoal() ) )
         {
@@ -214,9 +252,20 @@ public class MavenBundlePluginConfigurator
         {
             setBoolean( configuration, "rebuildBundle", true );
         }
+
+        if ( isDeclerativeServices( instructions ) )
+        {
+            setBoolean( configuration, "unpackBundle", true );
+        }
+
         execution.setConfiguration( configuration );
 
         return execution;
+    }
+
+    protected static boolean isDeclerativeServices( Map<String, String> instructions )
+    {
+        return instructions.containsKey( "Service-Component" ) || instructions.containsKey( "_dsannotations" );
     }
 
     private static void setBoolean( Xpp3Dom configuration, String name, boolean value )

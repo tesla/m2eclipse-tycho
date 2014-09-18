@@ -1,0 +1,7 @@
+package ds;
+
+public class ServiceImpl
+    implements Service
+{
+
+}
