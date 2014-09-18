@@ -11,7 +11,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IMarker;
@@ -40,20 +39,10 @@ public class PDEMavenBundlePluginConfigurator
     extends AbstractProjectConfigurator
     implements IJavaProjectConfigurator
 {
-
-    public static final String MOJO_GROUP_ID = "org.apache.felix";
-
-    public static final String MOJO_ARTIFACT_ID = "maven-bundle-plugin";
-
     @Override
     public void configure( ProjectConfigurationRequest request, IProgressMonitor monitor )
         throws CoreException
     {
-        if ( !isOsgiBundleProject( request.getMavenProjectFacade(), monitor ) )
-        {
-            throw new IllegalArgumentException();
-        }
-
         List<MojoExecution> executions = getMojoExecutions( request, monitor );
 
         if ( executions.size() > 1 )
@@ -101,33 +90,6 @@ public class PDEMavenBundlePluginConfigurator
                 entry.setExported( true );
             }
         }
-    }
-
-    static boolean isOsgiBundleProject( IMavenProjectFacade facade, IProgressMonitor monitor )
-        throws CoreException
-    {
-        List<Plugin> plugins = facade.getMavenProject( monitor ).getBuildPlugins();
-        if ( plugins != null )
-        {
-            for ( Plugin plugin : plugins )
-            {
-                if ( isMavenBundlePluginMojo( plugin ) && !plugin.getExecutions().isEmpty() )
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    static boolean isMavenBundlePluginMojo( Plugin plugin )
-    {
-        return isMavenBundlePluginMojo( plugin.getGroupId(), plugin.getArtifactId() );
-    }
-
-    static boolean isMavenBundlePluginMojo( String groupId, String artifactId )
-    {
-        return MOJO_GROUP_ID.equals( groupId ) && MOJO_ARTIFACT_ID.equals( artifactId );
     }
 
     private IPath getMetainfPath( IMavenProjectFacade facade, List<MojoExecution> executions, IProgressMonitor monitor )
