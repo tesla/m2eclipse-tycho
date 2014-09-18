@@ -140,6 +140,9 @@ public class MavenBundlePluginTest
     {
         IMavenProjectFacade maven =
             importMavenProject( "projects/maven-bundle-plugin/embed-dependency/maven", "pom.xml" );
+        maven.getProject().build( IncrementalProjectBuilder.FULL_BUILD, monitor );
+        workspace.build( IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor );
+        waitForJobsToComplete();
 
         IPluginModelBase model = PluginRegistry.findModel( maven.getProject() );
         assertNotNull( model );

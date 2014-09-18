@@ -1,20 +1,18 @@
 /*******************************************************************************
- * Copyright (c) 2008-2011 Sonatype, Inc.
+ * Copyright (c) 2008 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.sonatype.tycho.m2e.internal;
+package org.sonatype.tycho.m2e.felix.internal;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -31,59 +29,45 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
+import org.eclipse.m2e.core.project.configurator.ILifecycleMappingConfiguration;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
+import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.osgi.util.ManifestElement;
 import org.osgi.framework.BundleException;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
-public abstract class AbstractMavenBundlePluginProjectConfigurator
+/**
+ * Straightforward maven-bundle-plugin configurator.
+ * <p>
+ * For projects that use {@code manifest} goal, executes the goal and refreshes generated/regenerated resources in
+ * workspace.
+ * <p>
+ * For projects that use {@code bundle} goal, executes {@code manifest} goal instead. The idea is to only generate
+ * bundle manifest inside Eclipse workspace, never generate packaged bundle jar.
+ */
+public class MavenBundlePluginConfigurator
     extends AbstractProjectConfigurator
 {
-    public static final String MOJO_GROUP_ID = "org.apache.felix";
-
-    public static final String MOJO_ARTIFACT_ID = "maven-bundle-plugin";
-
-    protected static final QualifiedName PROP_FORCE_GENERATE = new QualifiedName( M2ETychoActivator.PLUGIN_ID,
-                                                                                  "forceGenerate" );
+    private static final QualifiedName PROP_FORCE_GENERATE =
+        new QualifiedName( MavenBundlePluginConfigurator.class.getName(), "forceGenerate" );
 
     private static final ArtifactVersion VERSION_2_3_6 = new DefaultArtifactVersion( "2.3.6" );
 
-    static boolean isOsgiBundleProject( IMavenProjectFacade facade, IProgressMonitor monitor )
+    @Override
+    public void configure( ProjectConfigurationRequest request, IProgressMonitor monitor )
         throws CoreException
     {
-        List<Plugin> plugins = facade.getMavenProject( monitor ).getBuildPlugins();
-        if ( plugins != null )
-        {
-            for ( Plugin plugin : plugins )
-            {
-                if ( isMavenBundlePluginMojo( plugin ) && !plugin.getExecutions().isEmpty() )
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
-    static boolean isMavenBundlePluginMojo( MojoExecution execution )
-    {
-        return isMavenBundlePluginMojo( execution.getGroupId(), execution.getArtifactId() );
-    }
-
-    static boolean isMavenBundlePluginMojo( Plugin plugin )
-    {
-        return isMavenBundlePluginMojo( plugin.getGroupId(), plugin.getArtifactId() );
-    }
-
-    static boolean isMavenBundlePluginMojo( String groupId, String artifactId )
-    {
-        return MOJO_GROUP_ID.equals( groupId ) && MOJO_ARTIFACT_ID.equals( artifactId );
-    }
-
-    static AbstractBuildParticipant getBuildParticipant( MojoExecution execution )
+    @Override
+    public AbstractBuildParticipant getBuildParticipant( IMavenProjectFacade projectFacade, MojoExecution execution,
+                                                         IPluginExecutionMetadata executionMetadata )
     {
         execution = amendMojoExecution( execution );
 
@@ -96,7 +80,7 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
                 BuildContext buildContext = getBuildContext();
                 IMavenProjectFacade facade = getMavenProjectFacade();
                 IProject project = facade.getProject();
-                IFile manifest = project.getFolder( getMetainfPath( facade, monitor ) ).getFile( "MANIFEST.MF" );
+                IFile manifest = getManifestFile( facade, getMojoExecution(), monitor );
 
                 // regenerate bundle manifest if any of the following is true
                 // - full workspace build
@@ -130,6 +114,7 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
 
                 Set<IProject> projects = super.build( kind, monitor );
                 manifest.refreshLocal( IResource.DEPTH_INFINITE, monitor ); // refresh parent?
+
                 return projects;
             }
 
@@ -198,16 +183,12 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
                 String[] includedFiles = ds.getIncludedFiles();
                 return includedFiles != null && includedFiles.length > 0;
             }
+
         };
     }
 
     protected static MojoExecution amendMojoExecution( MojoExecution execution )
     {
-        if ( !isMavenBundlePluginMojo( execution ) )
-        {
-            throw new IllegalArgumentException();
-        }
-
         if ( "bundle".equals( execution.getGoal() ) )
         {
             // do not generate complete bundle. this is both slow and can produce unexpected workspace changes
@@ -237,25 +218,81 @@ public abstract class AbstractMavenBundlePluginProjectConfigurator
         return execution;
     }
 
-    /**
-     * Returns project relative path of the <b>folder</b> where the generated manifest is or will be written
-     */
-    static IPath getMetainfPath( IMavenProjectFacade facade, IProgressMonitor monitor )
+    @Override
+    public void mavenProjectChanged( MavenProjectChangedEvent event, IProgressMonitor monitor )
         throws CoreException
     {
-        IMaven maven = MavenPlugin.getMaven();
-        for ( MojoExecution execution : facade.getMojoExecutions( MOJO_GROUP_ID, MOJO_ARTIFACT_ID, monitor, "manifest",
-                                                                  "bundle" ) )
+        if ( MavenProjectChangedEvent.KIND_CHANGED == event.getKind()
+            && MavenProjectChangedEvent.FLAG_DEPENDENCIES == event.getFlags() )
         {
-            MavenProject mavenProject = facade.getMavenProject( monitor );
-            File location = maven.getMojoParameterValue( mavenProject, execution, "manifestLocation", File.class, monitor );
-            if ( location != null )
+            forceManifestRegeneration( event.getMavenProject().getProject(), monitor );
+        }
+    }
+
+    protected IFile getManifestFile( IMavenProjectFacade facade, MojoExecution execution, IProgressMonitor monitor )
+        throws CoreException
+    {
+        File manifestFile =
+            getParameterValue( facade.getMavenProject(), "manifestLocation", File.class, execution, monitor );
+        IPath projectPath = facade.getProjectRelativePath( manifestFile.getAbsolutePath() ).append( "MANIFEST.MF" );
+        return facade.getProject().getFile( projectPath );
+    }
+
+    @Override
+    public boolean hasConfigurationChanged( IMavenProjectFacade newFacade,
+                                            ILifecycleMappingConfiguration oldProjectConfiguration,
+                                            MojoExecutionKey key, IProgressMonitor monitor )
+    {
+        if ( super.hasConfigurationChanged( newFacade, oldProjectConfiguration, key, monitor ) )
+        {
+            try
             {
-                return facade.getProjectRelativePath( location.getAbsolutePath() );
+                if ( !equalsManifestLocation( newFacade.getMojoExecution( key, monitor ),
+                                              oldProjectConfiguration.getMojoExecutionConfiguration( key ) ) )
+                {
+                    return true;
+                }
+
+                forceManifestRegeneration( newFacade.getProject(), monitor );
+            }
+            catch ( CoreException e )
+            {
+                return true;
             }
         }
 
-        return null;
+        return false;
+    }
+
+    private boolean equalsManifestLocation( MojoExecution mojoExecution, Xpp3Dom oldConfiguration )
+    {
+        // for now, just compare xml configuration, but ideally, getMetainfPath should be used to determine new manifest
+        // location and the result should be compared to the currently configured PDE manifest location.
+
+        if ( mojoExecution == null )
+        {
+            return true;
+        }
+
+        Xpp3Dom configuration = mojoExecution.getConfiguration();
+
+        Xpp3Dom metainf = getManifestLocation( configuration );
+        Xpp3Dom oldMetainf = getManifestLocation( oldConfiguration );
+
+        return metainf != null ? metainf.equals( oldMetainf ) : oldMetainf == null;
+    }
+
+    protected Xpp3Dom getManifestLocation( Xpp3Dom configuration )
+    {
+        return configuration != null ? configuration.getChild( "manifestLocation" ) : null;
+    }
+
+    protected void forceManifestRegeneration( IProject project, IProgressMonitor monitor )
+        throws CoreException
+    {
+        // this is a less pretty way to force bundle manifest regeneration.
+        // the property is checked and reset by the build participant
+        project.setSessionProperty( PROP_FORCE_GENERATE, "true" );
     }
 
 }

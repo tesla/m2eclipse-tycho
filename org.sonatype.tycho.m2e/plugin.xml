@@ -20,9 +20,15 @@
   <extension
     point="org.eclipse.m2e.core.projectConfigurators">
     <configurator
-      class="org.sonatype.tycho.m2e.internal.OsgiBundleProjectConfigurator"
+      class="org.sonatype.tycho.m2e.felix.internal.MavenBundlePluginConfigurator"
       id="maven-bundle-plugin"
       name="Project Configurator for maven-bundle-plugin osgi-bundle projects">
+    </configurator>
+    <configurator
+          class="org.sonatype.tycho.m2e.internal.PDEMavenBundlePluginConfigurator"
+          id="pde-maven-bundle-plugin"
+          name="PDE integration for maven-bundle-plugin projects"
+          secondaryTo="maven-bundle-plugin">
     </configurator>
   </extension>
   <extension

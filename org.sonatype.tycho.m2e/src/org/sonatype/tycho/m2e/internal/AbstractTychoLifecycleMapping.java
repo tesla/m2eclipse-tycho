@@ -28,6 +28,7 @@ import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.pde.internal.core.natures.PDE;
 import org.eclipse.pde.internal.core.util.CoreUtility;
+import org.sonatype.tycho.m2e.felix.internal.MavenBundlePluginConfigurator;
 
 @SuppressWarnings( "restriction" )
 public abstract class AbstractTychoLifecycleMapping
@@ -93,7 +94,8 @@ public abstract class AbstractTychoLifecycleMapping
         while ( li.hasNext() )
         {
             AbstractProjectConfigurator configurator = li.next();
-            if ( configurator instanceof OsgiBundleProjectConfigurator )
+            if ( configurator instanceof MavenBundlePluginConfigurator
+                || configurator instanceof PDEMavenBundlePluginConfigurator )
             {
                 li.remove();
             }
