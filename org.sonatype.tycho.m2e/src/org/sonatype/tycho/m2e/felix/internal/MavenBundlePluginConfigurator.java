@@ -203,21 +203,31 @@ public class MavenBundlePluginConfigurator
             MojoExecution _execution =
                 new MojoExecution( execution.getPlugin(), "manifest", "m2e-tycho:" + execution.getExecutionId()
                     + ":manifest" );
-            Xpp3Dom configuration = execution.getConfiguration();
-            // workaround for https://issues.apache.org/jira/browse/FELIX-3254
-            if ( VERSION_2_3_6.compareTo( new DefaultArtifactVersion( execution.getVersion() ) ) <= 0 )
-            {
-                configuration = new Xpp3Dom( configuration );
-                Xpp3Dom rebuildBundle = new Xpp3Dom( "rebuildBundle" );
-                rebuildBundle.setValue( "true" );
-                configuration.addChild( rebuildBundle );
-            }
-            _execution.setConfiguration( configuration );
+            _execution.setConfiguration( execution.getConfiguration() );
             _execution.setMojoDescriptor( descriptor );
             _execution.setLifecyclePhase( execution.getLifecyclePhase() );
             execution = _execution;
         }
+
+        Xpp3Dom configuration = new Xpp3Dom( execution.getConfiguration() );
+        if ( VERSION_2_3_6.compareTo( new DefaultArtifactVersion( execution.getVersion() ) ) <= 0 )
+        {
+            setBoolean( configuration, "rebuildBundle", true );
+        }
+        execution.setConfiguration( configuration );
+
         return execution;
+    }
+
+    private static void setBoolean( Xpp3Dom configuration, String name, boolean value )
+    {
+        Xpp3Dom parameter = configuration.getChild( name );
+        if ( parameter == null )
+        {
+            parameter = new Xpp3Dom( name );
+            configuration.addChild( parameter );
+        }
+        parameter.setValue( Boolean.toString( value ) );
     }
 
     @Override
