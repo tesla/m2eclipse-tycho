@@ -16,13 +16,11 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.Scanner;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -96,8 +94,6 @@ public class MavenBundlePluginConfigurator
                 // regenerate bundle manifest if any of the following is true
                 // - full workspace build
                 // - PROP_FORCE_GENERATE project session property is set (see the comment below)
-                // - generated bundle manifest changed (why?)
-                // - files under project build output folder changed
                 // - any of included bnd files changed
 
                 boolean generate = IncrementalProjectBuilder.FULL_BUILD == kind;
@@ -110,13 +106,7 @@ public class MavenBundlePluginConfigurator
                 // reset FORCE flag so we don't regenerate forever
                 project.setSessionProperty( PROP_FORCE_GENERATE, null );
 
-                IResourceDelta delta = getDelta( project );
-
-                generate = generate || isManifestChange( delta, manifest );
-
                 generate = generate || isIncludeChange( buildContext, instructions );
-
-                generate = generate || isBuildOutputChange( buildContext, facade.getMavenProject( monitor ) );
 
                 if ( !generate )
                 {
@@ -190,20 +180,6 @@ public class MavenBundlePluginConfigurator
                 }
 
                 return false;
-            }
-
-            private boolean isManifestChange( IResourceDelta delta, IFile manifest )
-            {
-                return !manifest.isAccessible()
-                    || ( delta != null && delta.findMember( manifest.getProjectRelativePath() ) != null );
-            }
-
-            private boolean isBuildOutputChange( BuildContext buildContext, MavenProject mavenProject )
-            {
-                Scanner ds = buildContext.newScanner( new File( mavenProject.getBuild().getOutputDirectory() ) );
-                ds.scan();
-                String[] includedFiles = ds.getIncludedFiles();
-                return includedFiles != null && includedFiles.length > 0;
             }
 
             @Override
