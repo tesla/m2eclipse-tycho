@@ -35,7 +35,6 @@ import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMappingConfiguration;
-import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.osgi.util.ManifestElement;
@@ -54,6 +53,8 @@ import org.sonatype.plexus.build.incremental.BuildContext;
 public class MavenBundlePluginConfigurator
     extends AbstractProjectConfigurator
 {
+    private static final IMaven maven = MavenPlugin.getMaven();
+
     private static final QualifiedName PROP_FORCE_GENERATE =
         new QualifiedName( MavenBundlePluginConfigurator.class.getName(), "forceGenerate" );
 
@@ -71,9 +72,9 @@ public class MavenBundlePluginConfigurator
     public AbstractBuildParticipant getBuildParticipant( IMavenProjectFacade projectFacade, MojoExecution execution,
                                                          IPluginExecutionMetadata executionMetadata )
     {
-        execution = amendMojoExecution( execution );
+        final MojoExecution _execution = amendMojoExecution( execution );
 
-        return new MojoExecutionBuildParticipant( execution, true )
+        return new AbstractBuildParticipant()
         {
             @Override
             public Set<IProject> build( int kind, IProgressMonitor monitor )
@@ -82,7 +83,8 @@ public class MavenBundlePluginConfigurator
                 BuildContext buildContext = getBuildContext();
                 IMavenProjectFacade facade = getMavenProjectFacade();
                 IProject project = facade.getProject();
-                IFile manifest = getManifestFile( facade, getMojoExecution(), monitor );
+                MavenProject mavenProject = facade.getMavenProject( monitor );
+                IFile manifest = getManifestFile( facade, _execution, monitor );
 
                 // regenerate bundle manifest if any of the following is true
                 // - full workspace build
@@ -105,7 +107,7 @@ public class MavenBundlePluginConfigurator
 
                 generate = generate || isManifestChange( delta, manifest );
 
-                generate = generate || isIncludeChange( buildContext, monitor );
+                generate = generate || isIncludeChange( buildContext, mavenProject, monitor );
 
                 generate = generate || isBuildOutputChange( buildContext, facade.getMavenProject( monitor ) );
 
@@ -114,22 +116,20 @@ public class MavenBundlePluginConfigurator
                     return null;
                 }
 
-                Set<IProject> projects = super.build( kind, monitor );
+                maven.execute( mavenProject, _execution, monitor );
+
                 manifest.refreshLocal( IResource.DEPTH_INFINITE, monitor ); // refresh parent?
 
-                return projects;
+                return null;
             }
 
-            private boolean isIncludeChange( BuildContext buildContext, IProgressMonitor monitor )
+            private boolean isIncludeChange( BuildContext buildContext, MavenProject mavenProject,
+                                             IProgressMonitor monitor )
                 throws CoreException
             {
-                IMaven maven = MavenPlugin.getMaven();
-
-                MavenProject mavenProject = getMavenProjectFacade().getMavenProject( monitor );
-
                 @SuppressWarnings( "unchecked" )
                 Map<String, String> instructions =
-                    maven.getMojoParameterValue( mavenProject, getMojoExecution(), "instructions", Map.class, monitor );
+                    maven.getMojoParameterValue( mavenProject, _execution, "instructions", Map.class, monitor );
 
                 if ( instructions == null )
                 {
