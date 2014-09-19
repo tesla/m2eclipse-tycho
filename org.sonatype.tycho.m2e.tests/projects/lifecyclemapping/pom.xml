@@ -8,14 +8,14 @@
   <packaging>pom</packaging>
 
   <properties>
-    <tycho-version>0.9.0</tycho-version>
+    <tycho-version>0.18.1</tycho-version>
     <m2e-version>0.10.0</m2e-version>
   </properties>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.tycho</groupId>
+        <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-maven-plugin</artifactId>
         <version>${tycho-version}</version>
         <extensions>true</extensions>
