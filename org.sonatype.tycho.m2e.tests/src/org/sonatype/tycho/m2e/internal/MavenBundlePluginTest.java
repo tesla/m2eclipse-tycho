@@ -275,7 +275,7 @@ public class MavenBundlePluginTest
 
         // incremental behaviour
 
-        // remove @Component annotation, assert ds descriptor is removed 
+        // remove @Component annotation, assert ds descriptor is removed
         copyContent( project, "src/main/java/ds/ServiceImpl.java-nods", "src/main/java/ds/ServiceImpl.java" );
         project.build( IncrementalProjectBuilder.CLEAN_BUILD, monitor );
         project.build( IncrementalProjectBuilder.FULL_BUILD, monitor );
@@ -287,6 +287,25 @@ public class MavenBundlePluginTest
         project.build( IncrementalProjectBuilder.CLEAN_BUILD, monitor );
         project.build( IncrementalProjectBuilder.FULL_BUILD, monitor );
         project.build( IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor );
+        assertTrue( cfile.exists() );
+    }
+
+    public void testDeclerativeServicesBnd()
+        throws Exception
+    {
+        IMavenProjectFacade facade =
+            importMavenProject( "projects/maven-bundle-plugin/declerative-services-bnd", "pom.xml" );
+        waitForJobsToComplete();
+        workspace.build( IncrementalProjectBuilder.FULL_BUILD, monitor );
+        assertNoErrors( facade.getProject() );
+
+        IProject project = facade.getProject();
+        IFile mfile = project.getFile( "META-INF/MANIFEST.MF" );
+
+        Manifest mf = loadManifest( mfile );
+        assertEquals( "OSGI-INF/ds.ServiceImpl.xml", mf.getMainAttributes().getValue( "Service-Component" ) );
+
+        IFile cfile = project.getFile( "target/classes/OSGI-INF/ds.ServiceImpl.xml" );
         assertTrue( cfile.exists() );
     }
 

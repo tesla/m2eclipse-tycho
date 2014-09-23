@@ -7,11 +7,17 @@
  *******************************************************************************/
 package org.sonatype.tycho.m2e.felix.internal;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
@@ -90,7 +96,7 @@ public class MavenBundlePluginConfigurator
                 Map<String, String> instructions =
                     maven.getMojoParameterValue( mavenProject, execution, "instructions", Map.class, monitor );
 
-                MojoExecution _execution = amendMojoExecution( execution, instructions );
+                MojoExecution _execution = amendMojoExecution( mavenProject, execution, instructions );
 
                 IFile manifest = getManifestFile( facade, _execution, monitor );
 
@@ -120,7 +126,7 @@ public class MavenBundlePluginConfigurator
 
                 manifest.refreshLocal( IResource.DEPTH_INFINITE, monitor ); // refresh parent?
 
-                if ( isDeclerativeServices( instructions ) )
+                if ( isDeclerativeServices( mavenProject.getBasedir(), instructions ) )
                 {
                     IFolder outputFolder = getOutputFolder( monitor, facade, _execution );
                     outputFolder.getFolder( "OSGI-OPT" ).refreshLocal( IResource.DEPTH_INFINITE, monitor );
@@ -162,13 +168,13 @@ public class MavenBundlePluginConfigurator
                 throws CoreException
             {
                 IMavenProjectFacade facade = getMavenProjectFacade();
+                MavenProject mavenProject = facade.getMavenProject( monitor );
 
                 @SuppressWarnings( "unchecked" )
                 Map<String, String> instructions =
-                    maven.getMojoParameterValue( facade.getMavenProject( monitor ), execution, "instructions",
-                                                 Map.class, monitor );
+                    maven.getMojoParameterValue( mavenProject, execution, "instructions", Map.class, monitor );
 
-                if ( isDeclerativeServices( instructions ) )
+                if ( isDeclerativeServices( mavenProject.getBasedir(), instructions ) )
                 {
                     IFolder outputFolder = getOutputFolder( monitor, facade, execution );
                     outputFolder.getFolder( "OSGI-OPT" ).delete( true, monitor );
@@ -178,7 +184,8 @@ public class MavenBundlePluginConfigurator
         };
     }
 
-    protected static MojoExecution amendMojoExecution( MojoExecution execution, Map<String, String> instructions )
+    protected static MojoExecution amendMojoExecution( MavenProject mavenProject, MojoExecution execution,
+                                                       Map<String, String> instructions )
     {
         if ( "bundle".equals( execution.getGoal() ) )
         {
@@ -204,7 +211,7 @@ public class MavenBundlePluginConfigurator
             setBoolean( configuration, "rebuildBundle", true );
         }
 
-        if ( isDeclerativeServices( instructions ) )
+        if ( isDeclerativeServices( mavenProject.getBasedir(), instructions ) )
         {
             setBoolean( configuration, "unpackBundle", true );
         }
@@ -217,6 +224,45 @@ public class MavenBundlePluginConfigurator
     protected static boolean isDeclerativeServices( Map<String, String> instructions )
     {
         return instructions.containsKey( "Service-Component" ) || instructions.containsKey( "_dsannotations" );
+    }
+
+    protected static boolean isDeclerativeServices( File basedir, Map<String, String> instructions )
+    {
+        if ( isDeclerativeServices( instructions ) )
+        {
+            return true;
+        }
+
+        // Properties class can be used to read bnd files http://www.aqute.biz/Bnd/Format
+        for ( String path : getIncludeBndFilePaths( instructions ) )
+        {
+            if ( isDeclerativeServices( loadBndFile( new File( basedir, path ) ) ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static Map<String, String> loadBndFile( File file )
+    {
+        Properties properties = new Properties();
+        try (InputStream is = new BufferedInputStream( new FileInputStream( file ) ))
+        {
+            properties.load( is );
+        }
+        catch ( IOException e )
+        {
+            // TODO create error marker
+            return Collections.emptyMap();
+        }
+        Map<String, String> map = new LinkedHashMap<>();
+        for ( String key : properties.stringPropertyNames() )
+        {
+            map.put( key, properties.getProperty( key ) );
+        }
+        return map;
     }
 
     static List<String> getIncludeBndFilePaths( Map<String, String> instructions )
