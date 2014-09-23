@@ -4,41 +4,61 @@
   <profiles>
     <profile>
       <id>test</id>
-        <repositories>
-          <repository>
-            <id>central</id>
-            <url>file:remoterepo</url>
-            <snapshots><enabled>true</enabled></snapshots>
-            <releases><enabled>true</enabled></releases>
-          </repository>
-        </repositories>
-        <pluginRepositories>
-          <pluginRepository>
-            <id>central</id>
-            <url>file:remoterepo</url>
-            <snapshots><enabled>true</enabled></snapshots>
-            <releases><enabled>true</enabled></releases>
-          </pluginRepository>
-        </pluginRepositories>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>file:remoterepo</url>
+          <snapshots>
+            <enabled>true</enabled>
+            <checksumPolicy>ignore</checksumPolicy>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>file:remoterepo</url>
+          <snapshots>
+            <enabled>true</enabled>
+            <checksumPolicy>ignore</checksumPolicy>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+        </pluginRepository>
+      </pluginRepositories>
     </profile>
     <profile>
       <id>rso</id>
-        <repositories>
-          <repository>
-            <id>central</id>
-            <url>https://repository.sonatype.org/content/repositories/central/</url>
-            <snapshots><enabled>true</enabled></snapshots>
-            <releases><enabled>true</enabled></releases>
-          </repository>
-        </repositories>
-        <pluginRepositories>
-          <pluginRepository>
-            <id>central</id>
-            <url>https://repository.sonatype.org/content/repositories/central/</url>
-            <snapshots><enabled>true</enabled></snapshots>
-            <releases><enabled>true</enabled></releases>
-          </pluginRepository>
-        </pluginRepositories>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>https://repository.sonatype.org/content/repositories/central/</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>https://repository.sonatype.org/content/repositories/central/</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </pluginRepository>
+      </pluginRepositories>
     </profile>
   </profiles>
 
