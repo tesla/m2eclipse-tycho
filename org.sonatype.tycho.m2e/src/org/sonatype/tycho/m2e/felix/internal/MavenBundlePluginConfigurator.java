@@ -8,6 +8,9 @@
 package org.sonatype.tycho.m2e.felix.internal;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -106,7 +109,7 @@ public class MavenBundlePluginConfigurator
                 // reset FORCE flag so we don't regenerate forever
                 project.setSessionProperty( PROP_FORCE_GENERATE, null );
 
-                generate = generate || isIncludeChange( buildContext, instructions );
+                generate = generate || isIncludeBndFileChange( buildContext, instructions );
 
                 if ( !generate )
                 {
@@ -138,39 +141,11 @@ public class MavenBundlePluginConfigurator
                 return outputFolder;
             }
 
-            private boolean isIncludeChange( BuildContext buildContext, Map<String, String> instructions )
+            private boolean isIncludeBndFileChange( BuildContext buildContext, Map<String, String> instructions )
                 throws CoreException
             {
-                if ( instructions == null )
+                for ( String path : getIncludeBndFilePaths( instructions ) )
                 {
-                    return false;
-                }
-
-                String include = instructions.get( "_include" );
-                if ( include == null )
-                {
-                    return false;
-                }
-
-                ManifestElement[] elements;
-                try
-                {
-                    elements = ManifestElement.parseHeader( "_include", include );
-                }
-                catch ( BundleException e )
-                {
-                    // assume nothing changed because BND won't be able to parse it either
-                    return false;
-                }
-
-                for ( ManifestElement element : elements )
-                {
-                    String path = element.getValueComponents()[0];
-                    if ( path.startsWith( "-" ) || path.startsWith( "~" ) )
-                    {
-                        path = path.substring( 1 );
-                    }
-
                     // this does not detect changes in outside ${project.basedir}
 
                     if ( buildContext.hasDelta( path ) )
@@ -242,6 +217,45 @@ public class MavenBundlePluginConfigurator
     protected static boolean isDeclerativeServices( Map<String, String> instructions )
     {
         return instructions.containsKey( "Service-Component" ) || instructions.containsKey( "_dsannotations" );
+    }
+
+    static List<String> getIncludeBndFilePaths( Map<String, String> instructions )
+    {
+        if ( instructions == null )
+        {
+            return Collections.emptyList();
+        }
+
+        String include = instructions.get( "_include" );
+        if ( include == null )
+        {
+            return Collections.emptyList();
+        }
+
+        ManifestElement[] elements;
+        try
+        {
+            elements = ManifestElement.parseHeader( "_include", include );
+        }
+        catch ( BundleException e )
+        {
+            // assume no included bnd files
+            return Collections.emptyList();
+        }
+
+        List<String> includes = new ArrayList<String>();
+        for ( ManifestElement element : elements )
+        {
+            String path = element.getValueComponents()[0];
+            if ( path.startsWith( "-" ) || path.startsWith( "~" ) )
+            {
+                path = path.substring( 1 );
+            }
+
+            includes.add( path );
+        }
+
+        return includes;
     }
 
     private static void setBoolean( Xpp3Dom configuration, String name, boolean value )
