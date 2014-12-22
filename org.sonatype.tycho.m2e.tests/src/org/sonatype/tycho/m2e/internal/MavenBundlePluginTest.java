@@ -151,9 +151,10 @@ public class MavenBundlePluginTest
         IClasspathEntry[] cp = javaProject.getRawClasspath();
         IClasspathEntry mavenContainer = getClasspathEntry( cp, new Path( IClasspathManager.CONTAINER_ID ) );
         assertNotNull( mavenContainer );
-        assertTrue( mavenContainer.isExported() );
 
         IProject project = createExisting( "pde", "projects/maven-bundle-plugin/embed-dependency/pde" );
+        IProject projectImportPackage =
+            createExisting( "pde-import-", "projects/maven-bundle-plugin/embed-dependency/pde-import-package" );
 
         workspace.build( IncrementalProjectBuilder.FULL_BUILD, monitor );
         workspace.build( IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor );
@@ -161,6 +162,7 @@ public class MavenBundlePluginTest
 
         assertNoErrors( maven.getProject() );
         assertNoErrors( project );
+        assertNoErrors( projectImportPackage );
     }
 
     public void testManifestGenerationAfterPomChange()

@@ -7,6 +7,8 @@
  *******************************************************************************/
 package org.sonatype.tycho.m2e.internal;
 
+import static org.sonatype.tycho.m2e.felix.internal.MavenBundlePluginConfigurator.PARAM_MANIFESTLOCATION;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +32,7 @@ import org.eclipse.m2e.core.project.configurator.ILifecycleMappingConfiguration;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
-import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
-import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.IJavaProjectConfigurator;
-import static org.sonatype.tycho.m2e.felix.internal.MavenBundlePluginConfigurator.PARAM_MANIFESTLOCATION;
 
 @SuppressWarnings( "restriction" )
 public class PDEMavenBundlePluginConfigurator
@@ -84,16 +83,6 @@ public class PDEMavenBundlePluginConfigurator
                                        IProgressMonitor monitor )
         throws CoreException
     {
-        // export maven dependencies classpath container, so dependent project can compile against embedded transitive
-        // dependencies. This breaks JDT classpath of plain maven dependents of this project, i.e. such dependents will
-        // be exposed to more classes compared to CLI build. Not sure what to do about it yet.
-        for ( IClasspathEntryDescriptor entry : classpath.getEntryDescriptors() )
-        {
-            if ( IClasspathManager.CONTAINER_ID.equals( entry.getPath().segment( 0 ) ) )
-            {
-                entry.setExported( true );
-            }
-        }
     }
 
     private IPath getMetainfPath( IMavenProjectFacade facade, List<MojoExecution> executions, IProgressMonitor monitor )

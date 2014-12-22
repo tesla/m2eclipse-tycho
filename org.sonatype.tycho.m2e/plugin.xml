@@ -41,4 +41,10 @@
            nature="org.eclipse.m2e.core.maven2Nature">
      </resolver>
   </extension>
+  <extension
+        point="org.eclipse.pde.core.pluginClasspathContributors">
+     <contributor
+           class="org.sonatype.tycho.m2e.internal.PDEClasspathContributor">
+     </contributor>
+  </extension>
 </plugin>

@@ -11,8 +11,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.m2e.jdt;bundle-version="[1.4.0,2.0.0)",
  org.eclipse.jdt.core,
  org.eclipse.jdt.launching,
- org.eclipse.pde.core;bundle-version="3.6.0",
- org.eclipse.debug.core;bundle-version="3.7.0",
+ org.eclipse.pde.core;bundle-version="3.9.0",
+ org.eclipse.debug.core;bundle-version="3.9.0",
  org.eclipse.core.resources
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7,
  JavaSE-1.8
