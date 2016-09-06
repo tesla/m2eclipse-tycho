@@ -309,6 +309,24 @@ public class MavenBundlePluginTest
         assertTrue( cfile.exists() );
     }
 
+    public void testCleanVersions()
+            throws Exception
+    {
+        IMavenProjectFacade facade = importMavenProject( "projects/maven-bundle-plugin/clean-versions", "pom.xml" );
+        IProject project = facade.getProject();
+        workspace.build( IncrementalProjectBuilder.FULL_BUILD, monitor );
+
+        assertNoErrors( project );
+
+        IFile mfile = project.getFile( "target/classes/META-INF/MANIFEST.MF" );
+
+        assertTrue( mfile.exists() );
+
+        Manifest mf = loadManifest( mfile );
+        assertEquals( "1.2.3.Alpha1" , mf.getMainAttributes().getValue( "Foo" ) );
+
+    }
+
     private Manifest loadManifest( IFile mfile )
         throws IOException, CoreException
     {
