@@ -320,7 +320,8 @@ public class MavenBundlePluginConfigurator
         throws CoreException
     {
         if ( MavenProjectChangedEvent.KIND_CHANGED == event.getKind()
-            && MavenProjectChangedEvent.FLAG_DEPENDENCIES == event.getFlags() )
+            && MavenProjectChangedEvent.FLAG_DEPENDENCIES == event.getFlags() 
+            || MavenProjectChangedEvent.KIND_ADDED == event.getKind())
         {
             forceManifestRegeneration( event.getMavenProject().getProject(), monitor );
         }
