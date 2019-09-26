@@ -27,7 +27,7 @@
 
   <properties>
     <repositoryPathId>m2eclipse-tycho</repositoryPathId>
-    <m2e-core.url>http://ifedorenko.github.com/m2e-extras/</m2e-core.url>
+    <m2e-core.url>http://download.eclipse.org/releases/2019-09</m2e-core.url>
   </properties>
   
   <repositories>
