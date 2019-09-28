@@ -17,7 +17,7 @@
   <parent>
     <groupId>io.takari.tycho</groupId>
     <artifactId>tycho-support</artifactId>
-    <version>0.15.0</version>
+    <version>1.1.0</version>
   </parent>
 
   <groupId>org.sonatype.tycho.m2e</groupId>
@@ -27,7 +27,16 @@
 
   <properties>
     <repositoryPathId>m2eclipse-tycho</repositoryPathId>
+    <m2e-core.url>http://download.eclipse.org/releases/2019-09</m2e-core.url>
   </properties>
+  
+  <repositories>
+  	<repository>
+   		<id>2019-09</id>
+   		<url>http://download.eclipse.org/releases/2019-09</url>
+   		<layout>p2</layout>
+  	</repository>
+  </repositories>
 
   <modules>
     <module>org.sonatype.tycho.m2e</module>
