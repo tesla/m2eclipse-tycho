@@ -76,7 +76,9 @@
         </parameters>
       </pluginExecutionFilter>
       <action>
-        <ignore />
+        <configurator>
+          <id>tycho-compiler-plugin</id>
+        </configurator>
       </action>
     </pluginExecution>
     <pluginExecution>

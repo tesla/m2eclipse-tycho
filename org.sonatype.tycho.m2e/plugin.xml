@@ -30,6 +30,11 @@
           name="PDE integration for maven-bundle-plugin projects"
           secondaryTo="maven-bundle-plugin">
     </configurator>
+    <configurator
+          class="org.sonatype.tycho.m2e.internal.TychoProjectConfigurator"
+          id="tycho-compiler-plugin"
+          name="Configuration for tycho projects">
+    </configurator>
   </extension>
   <extension
         point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
