@@ -13,8 +13,6 @@ import java.util.ListIterator;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.project.MavenProject;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.internal.project.registry.AbstractMavenDependencyResolver;
@@ -25,9 +23,6 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractCustomizableLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
-import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
-import org.eclipse.pde.internal.core.natures.PDE;
-import org.eclipse.pde.internal.core.util.CoreUtility;
 import org.sonatype.tycho.m2e.felix.internal.MavenBundlePluginConfigurator;
 
 @SuppressWarnings( "restriction" )
@@ -35,8 +30,6 @@ public class TychoLifecycleMapping
     extends AbstractCustomizableLifecycleMapping
     implements ILifecycleMapping, ILifecycleMapping2
 {
-
-    private PDEProjectHelper pdeHelper = PDEProjectHelper.getInstance();
 
     private static final AbstractMavenDependencyResolver NOOP_DEPENDENCY_RESOLVER =
         new AbstractMavenDependencyResolver()
@@ -49,38 +42,6 @@ public class TychoLifecycleMapping
             {
             }
         };
-
-    @Override
-    public void configure( ProjectConfigurationRequest request, IProgressMonitor monitor )
-        throws CoreException
-    {
-        super.configure( request, monitor );
-
-        MavenProject mavenProject = request.getMavenProject();
-        IProject project = request.getProject();
-
-        String packaging = mavenProject.getPackaging();
-        if ( "eclipse-plugin".equals( packaging ) || "eclipse-test-plugin".equals( packaging ) )
-        {
-            pdeHelper.configurePDEBundleProject( project, mavenProject, monitor );
-        }
-        else if ( "eclipse-feature".equals( packaging ) )
-        {
-            // see org.eclipse.pde.internal.ui.wizards.feature.AbstractCreateFeatureOperation
-            if ( !project.hasNature( PDE.FEATURE_NATURE ) )
-            {
-                CoreUtility.addNatureToProject( project, PDE.FEATURE_NATURE, monitor );
-            }
-        }
-        else if ( "eclipse-update-site".equals( packaging ) )
-        {
-            // see org.eclipse.pde.internal.ui.wizards.site.NewSiteProjectCreationOperation
-            if ( !project.hasNature( PDE.SITE_NATURE ) )
-            {
-                CoreUtility.addNatureToProject( project, PDE.SITE_NATURE, monitor );
-            }
-        }
-    }
 
     @Override
     public List<AbstractProjectConfigurator> getProjectConfigurators( IMavenProjectFacade projectFacade,
