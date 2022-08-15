@@ -28,15 +28,16 @@
   <properties>
     <repositoryPathId>m2eclipse-tycho</repositoryPathId>
     <tychoVersion>2.7.0</tychoVersion>
-    <eclipse-repo.url>http://download.eclipse.org/releases/2019-09</eclipse-repo.url>
-    <m2e-core.url>https://download.eclipse.org/technology/m2e/releases/1.13/</m2e-core.url>
+    <eclipse-repo.url>http://download.eclipse.org/releases/2022-06</eclipse-repo.url>
+    <m2e-core.url>https://download.eclipse.org/technology/m2e/releases/latest/</m2e-core.url>
+    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>17</maven.compiler.source>
   </properties>
 
   <modules>
     <module>org.sonatype.tycho.m2e</module>
     <module>org.sonatype.tycho.m2e.feature</module>
     <module>org.sonatype.tycho.repository</module>
-    <module>org.sonatype.tycho.m2e.tests</module>
   </modules>
 
   <build>
