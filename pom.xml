@@ -9,20 +9,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>io.takari.tycho</groupId>
-    <artifactId>tycho-support</artifactId>
-    <version>0.17.0</version>
-  </parent>
   <groupId>org.sonatype.tycho.m2e</groupId>
   <artifactId>m2eclipse-tycho</artifactId>
   <version>0.10.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <properties>
-    <repositoryPathId>m2eclipse-tycho</repositoryPathId>
-    <tychoVersion>2.7.5</tychoVersion>
-    <eclipse-repo.url>https://download.eclipse.org/releases/2022-09</eclipse-repo.url>
-    <m2e-core.url>https://download.eclipse.org/technology/m2e/releases/2.0.5/</m2e-core.url>
+    <tycho.version>2.7.5</tycho.version>
+    <tycho.extras.version>${tycho.version}</tycho.extras.version>
+    <eclipse.p2.repo>https://download.eclipse.org/releases/2022-09</eclipse.p2.repo>
+    <m2e.p2.repo>https://download.eclipse.org/technology/m2e/releases/2.0.5/</m2e.p2.repo>
     <tycho.test.jvmArgs>-Xmx512m</tycho.test.jvmArgs>
   </properties>
   <modules>
@@ -31,40 +26,73 @@
     <module>org.sonatype.tycho.repository</module>
     <module>org.sonatype.tycho.m2e.tests</module>
   </modules>
+  <repositories>
+    <repository>
+      <id>eclipse</id>
+      <layout>p2</layout>
+      <url>${eclipse.p2.repo}</url>
+    </repository>
+    <repository>
+      <id>m2e</id>
+      <layout>p2</layout>
+      <url>${m2e.p2.repo}</url>
+    </repository>
+  </repositories>
   <build>
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-surefire-plugin</artifactId>
+          <artifactId>tycho-packaging-plugin</artifactId>
+          <version>${tycho.version}</version>
           <configuration>
-            <dependencies combine.children="append">
-              <dependency>
-                <artifactId>org.eclipse.ui.workbench</artifactId>
-                <version>3.102.0</version>
-                <type>eclipse-plugin</type>
-              </dependency>
-              <dependency>
-                <artifactId>org.eclipse.equinox.event</artifactId>
-                <version>0.0.0</version>
-                <type>eclipse-plugin</type>
-              </dependency>
-              <dependency>
-                <artifactId>org.eclipse.e4.ui.workbench.addons.swt</artifactId>
-                <version>0.0.0</version>
-                <type>eclipse-plugin</type>
-              </dependency>
-              <dependency>
-                <!-- as of eclipse 4.4/luna, PDE requires PlatformAdmin service to operate -->
-                <artifactId>org.eclipse.osgi.compatibility.state</artifactId>
-                <version>0.0.0</version>
-                <type>eclipse-plugin</type>
-              </dependency>
-            </dependencies>
+            <format>yyyyMMdd-HHmm</format>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-surefire-plugin</artifactId>
+          <version>${tycho.version}</version>
+          <configuration>
+            <useUIHarness>true</useUIHarness>
+            <argLine>${tycho.test.jvmArgs}</argLine>
+            <!-- kill test JVM if tests take more than 1 minute (60 seconds) to finish -->
+            <forkedProcessTimeoutInSeconds>60</forkedProcessTimeoutInSeconds>
           </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-maven-plugin</artifactId>
+        <version>${tycho.version}</version>
+        <extensions>true</extensions>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>target-platform-configuration</artifactId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <resolver>p2</resolver>
+          <pomDependencies>consider</pomDependencies>
+          <ignoreTychoRepositories>true</ignoreTychoRepositories>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-source-plugin</artifactId>
+        <version>${tycho.version}</version>
+        <executions>
+          <execution>
+            <id>attach-source</id>
+            <goals>
+              <goal>plugin-source</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
   <profiles>
     <profile>
@@ -95,6 +123,46 @@
             </plugin>
           </plugins>
         </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>source-feature</id>
+      <activation>
+        <file>
+          <exists>feature.xml</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.tycho.extras</groupId>
+            <artifactId>tycho-source-feature-plugin</artifactId>
+            <version>${tycho.extras.version}</version>
+            <executions>
+              <execution>
+                <id>source-feature</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>source-feature</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>tycho-p2-plugin</artifactId>
+            <version>${tycho.version}</version>
+            <executions>
+              <execution>
+                <id>attach-p2-metadata</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>p2-metadata</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
       </build>
     </profile>
   </profiles>
