@@ -15,6 +15,7 @@
   <packaging>pom</packaging>
   <properties>
     <tycho.version>2.7.5</tycho.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <tycho.extras.version>${tycho.version}</tycho.extras.version>
     <eclipse.p2.repo>https://download.eclipse.org/releases/2022-09</eclipse.p2.repo>
     <m2e.p2.repo>https://download.eclipse.org/technology/m2e/releases/2.0.5/</m2e.p2.repo>
@@ -54,7 +55,6 @@
           <artifactId>tycho-surefire-plugin</artifactId>
           <version>${tycho.version}</version>
           <configuration>
-            <useUIHarness>true</useUIHarness>
             <argLine>${tycho.test.jvmArgs}</argLine>
             <!-- kill test JVM if tests take more than 1 minute (60 seconds) to finish -->
             <forkedProcessTimeoutInSeconds>60</forkedProcessTimeoutInSeconds>
