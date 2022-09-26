@@ -8,7 +8,15 @@
 
 package org.sonatype.tycho.m2e.internal;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
+import java.util.Arrays;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -23,6 +31,7 @@ import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.internal.core.ClasspathComputer;
 import org.eclipse.pde.internal.core.natures.PDE;
+import org.junit.Test;
 
 @SuppressWarnings( "restriction" )
 public class TychoLifecycleMappingTest
@@ -44,6 +53,7 @@ public class TychoLifecycleMappingTest
         return facade;
     }
 
+    @Test
     public void testTychoLifecycleMapping_EclipsePlugin()
         throws Exception
     {
@@ -65,16 +75,11 @@ public class TychoLifecycleMappingTest
 
     private void assertClasspathContains( IClasspathEntry[] classpathEntries, String path )
     {
-        for ( IClasspathEntry classpathEntry : classpathEntries )
-        {
-            if ( path.equals( classpathEntry.getPath().toString() ) )
-            {
-                return;
-            }
-        }
-        fail( "Classpath does not contain: " + path );
+        var entries = Arrays.stream(classpathEntries).map(cpe -> cpe.getPath().toString()).collect(Collectors.joining(","));
+        assertTrue( "Classpath ["+entries+"] does not contain: " + path, entries.contains(path) );
     }
 
+    @Test
     public void testTychoLifecycleMapping_EclipseTestPlugin()
         throws Exception
     {
@@ -95,6 +100,7 @@ public class TychoLifecycleMappingTest
         assertClasspathContains( classpathEntries, "org.eclipse.pde.core.requiredPlugins" );
     }
 
+    @Test
     public void testTychoLifecycleMapping_EclipseFeature()
         throws Exception
     {
@@ -105,6 +111,7 @@ public class TychoLifecycleMappingTest
         assertTrue( project.hasNature( PDE.FEATURE_NATURE ) );
     }
 
+    @Test
     public void testTychoLifecycleMapping_EclipseUpdateSite()
         throws Exception
     {
@@ -115,7 +122,8 @@ public class TychoLifecycleMappingTest
         IProject project = facade.getProject();
         assertTrue( project.hasNature( PDE.SITE_NATURE ) );
     }
-
+    
+    @Test
     public void testUpdateWhenJarInClasspath_EclipsePlugin()
         throws Exception
     {

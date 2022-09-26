@@ -8,6 +8,12 @@
 
 package org.sonatype.tycho.m2e.internal;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,12 +43,14 @@ import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.internal.core.natures.PDE;
+import org.junit.Test;
 
 @SuppressWarnings( "restriction" )
 public class MavenBundlePluginTest
     extends AbstractLifecycleMappingTest
 {
 
+	@Test
     public void testImport()
         throws Exception
     {
@@ -111,6 +119,7 @@ public class MavenBundlePluginTest
         assertEquals( "org.eclipse.m2e.core.maven2Builder", builders[0].getBuilderName() );
     }
 
+    @Test
     public void testImportProjectWithBundlePackaging()
         throws Exception
     {
@@ -123,6 +132,7 @@ public class MavenBundlePluginTest
         assertFalse( bundle.exists() );
     }
 
+    @Test
     public void testDefaultManifestLocation()
         throws Exception
     {
@@ -135,6 +145,7 @@ public class MavenBundlePluginTest
         assertFalse( manifest.exists() );
     }
 
+    @Test
     public void testEmbedDependency()
         throws Exception
     {
@@ -165,6 +176,7 @@ public class MavenBundlePluginTest
         assertNoErrors( projectImportPackage );
     }
 
+    @Test
     public void testManifestGenerationAfterPomChange()
         throws Exception
     {
@@ -187,7 +199,9 @@ public class MavenBundlePluginTest
         mf = loadManifest( mfile );
         assertEquals( "pom-change;singleton:=true", mf.getMainAttributes().getValue( "Bundle-SymbolicName" ) );
     }
+    
 
+    @Test
     public void testRequestConfigurationUpdateAfterManifestLocationChange()
         throws Exception
     {
@@ -203,7 +217,8 @@ public class MavenBundlePluginTest
                                             "Project configuration is not up-to-date with pom.xml.", null, null,
                                             project );
     }
-
+    
+    @Test
     public void testIncludeBndFileChange()
         throws Exception
     {
@@ -226,18 +241,19 @@ public class MavenBundlePluginTest
         assertEquals( "bnd-file-change;singleton:=true", mf.getMainAttributes().getValue( "Bundle-SymbolicName" ) );
     }
 
+    @Test
     public void testMultipleExecutionsErrorMarkers()
         throws Exception
     {
         IMavenProjectFacade facade = importMavenProject( "projects/maven-bundle-plugin/multiple-executions", "pom.xml" );
-        IProject[] projects = new IProject[] { facade.getProject() };
+        IProject project = facade.getProject();
 
         waitForJobsToComplete();
         workspace.build( IncrementalProjectBuilder.FULL_BUILD, monitor );
 
         ProjectConfigurationManager configurationManager =
             (ProjectConfigurationManager) MavenPlugin.getProjectConfigurationManager();
-        MavenUpdateRequest request = new MavenUpdateRequest( projects, false, true );
+        MavenUpdateRequest request = new MavenUpdateRequest( project, false, true );
         configurationManager.updateProjectConfiguration( request, true, true, true, monitor );
 
         waitForJobsToComplete();
@@ -250,13 +266,14 @@ public class MavenBundlePluginTest
         copyContent( facade.getProject(), new File( "projects/maven-bundle-plugin/multiple-executions/validpom.xml" ),
                      "pom.xml" );
 
-        request = new MavenUpdateRequest( projects, false, true );
+        request = new MavenUpdateRequest( project, false, true );
         configurationManager.updateProjectConfiguration( request, true, true, true, monitor );
 
         waitForJobsToComplete();
-        assertNoErrors( projects[0] );
+        assertNoErrors( project );
     }
 
+    @Test
     public void testDeclerativeServices()
         throws Exception
     {
@@ -292,6 +309,7 @@ public class MavenBundlePluginTest
         assertTrue( cfile.exists() );
     }
 
+    @Test
     public void testDeclerativeServicesBnd()
         throws Exception
     {
@@ -311,6 +329,7 @@ public class MavenBundlePluginTest
         assertTrue( cfile.exists() );
     }
 
+    @Test
     public void testCleanVersions()
             throws Exception
     {

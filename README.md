@@ -1,4 +1,9 @@
-# New since 0.7.0
+Installation
+------------
+in Eclipse:
 
-* Limited support for OSGi declarative services descriptor generation
-* Removed support for old (org.sonatype) versions of Tycho
+- open Help > Install New Software...
+- work with: `https://github.com/tesla/m2eclipse-tycho/releases/download/latest/`
+- expand the category and select the `Tycho Project Configurators` Feature
+- proceed with the installation
+- restart Eclipse
