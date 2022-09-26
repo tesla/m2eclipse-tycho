@@ -38,17 +38,7 @@ public class TychoLifecycleMapping
 
     private PDEProjectHelper pdeHelper = PDEProjectHelper.getInstance();
 
-    private static final AbstractMavenDependencyResolver NOOP_DEPENDENCY_RESOLVER =
-        new AbstractMavenDependencyResolver()
-        {
-            @Override
-            public void resolveProjectDependencies( IMavenProjectFacade facade, MavenExecutionRequest mavenRequest,
-                                                    Set<Capability> capabilities, Set<RequiredCapability> requirements,
-                                                    IProgressMonitor monitor )
-                throws CoreException
-            {
-            }
-        };
+    private static final AbstractMavenDependencyResolver NOOP_DEPENDENCY_RESOLVER = new AbstractMavenDependencyResolver(){};
 
     @Override
     public void configure( ProjectConfigurationRequest request, IProgressMonitor monitor )
@@ -56,8 +46,8 @@ public class TychoLifecycleMapping
     {
         super.configure( request, monitor );
 
-        MavenProject mavenProject = request.getMavenProject();
-        IProject project = request.getProject();
+        MavenProject mavenProject = request.mavenProject();
+        IProject project = request.mavenProjectFacade().getProject();
 
         String packaging = mavenProject.getPackaging();
         if ( "eclipse-plugin".equals( packaging ) || "eclipse-test-plugin".equals( packaging ) )

@@ -113,6 +113,7 @@ public class PDEProjectHelper
             return Status.OK_STATUS;
         }
     }
+    
 
     public void configurePDEBundleProject( IProject project, MavenProject mavenProject, IProgressMonitor monitor )
         throws CoreException

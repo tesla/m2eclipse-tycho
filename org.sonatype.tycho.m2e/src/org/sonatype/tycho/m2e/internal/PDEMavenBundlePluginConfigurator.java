@@ -45,6 +45,7 @@ public class PDEMavenBundlePluginConfigurator
     {
         List<MojoExecution> executions = getMojoExecutions( request, monitor );
 
+        IMavenProjectFacade facade = request.mavenProjectFacade();
         if ( executions.size() > 1 )
         {
             List<MavenProblemInfo> errors = new ArrayList<MavenProblemInfo>();
@@ -59,13 +60,12 @@ public class PDEMavenBundlePluginConfigurator
                 errors.add( problem );
             }
 
-            this.markerManager.addErrorMarkers( request.getPom(), IMavenConstants.MARKER_LIFECYCLEMAPPING_ID, errors );
+            this.markerManager.addErrorMarkers( facade.getPom(), IMavenConstants.MARKER_LIFECYCLEMAPPING_ID, errors );
         }
 
         // bundle manifest is generated in #configureRawClasspath, which is invoked earlier during project configuration
 
-        IProject project = request.getProject();
-        IMavenProjectFacade facade = request.getMavenProjectFacade();
+        IProject project = facade.getProject();
 
         IPath metainfPath = getMetainfPath( facade, executions, monitor );
 
